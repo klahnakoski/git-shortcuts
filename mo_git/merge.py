@@ -95,4 +95,3 @@ def merge(branch):
     subprocess.run(["git", "commit", "-m", f"merge {branch}"], check=True)
     print("\n✓ Merge completed.")
     return 1
-

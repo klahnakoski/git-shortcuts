@@ -13,33 +13,26 @@ from mo_git.checkout import checkout_branch, checkout_new_branch_with_alias
 
 def main():
     parser = argparse.ArgumentParser(
-        prog='mo-git',
-        description='Enhanced git workflow utilities',
+        prog="mo-git",
+        description="Enhanced git workflow utilities",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=get_examples()
+        epilog=get_examples(),
     )
 
-    subparsers = parser.add_subparsers(dest='command', help='Available commands')
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # Merge command
-    merge_parser = subparsers.add_parser(
-        'merge',
-        help='Merge branch with smart conflict resolution'
-    )
-    merge_parser.add_argument('branch', help='Branch to merge into current branch')
+    merge_parser = subparsers.add_parser("merge", help="Merge branch with smart conflict resolution")
+    merge_parser.add_argument("branch", help="Branch to merge into current branch")
 
     # Checkout command
-    checkout_parser = subparsers.add_parser(
-        'checkout',
-        help='Switch branches with smart stashing'
+    checkout_parser = subparsers.add_parser("checkout", help="Switch branches with smart stashing")
+    checkout_parser.add_argument("branch", help="Branch name or alias to checkout")
+    checkout_parser.add_argument("-b", "--new-branch", metavar="NAME", help="Create new branch with NAME")
+    checkout_parser.add_argument("--as", dest="alias", metavar="ALIAS", help="Alias for the new branch")
+    checkout_parser.add_argument(
+        "--from", dest="base", metavar="BASE", help="Base branch to branch from (name or alias)"
     )
-    checkout_parser.add_argument('branch', help='Branch name or alias to checkout')
-    checkout_parser.add_argument('-b', '--new-branch', metavar='NAME',
-                                help='Create new branch with NAME')
-    checkout_parser.add_argument('--as', dest='alias', metavar='ALIAS',
-                                help='Alias for the new branch')
-    checkout_parser.add_argument('--from', dest='base', metavar='BASE',
-                                help='Base branch to branch from (name or alias)')
 
     args = parser.parse_args()
 
@@ -47,10 +40,10 @@ def main():
         parser.print_help()
         return 1
 
-    if args.command == 'merge':
+    if args.command == "merge":
         return handle_merge(args)
 
-    if args.command == 'checkout':
+    if args.command == "checkout":
         return handle_checkout(args)
 
     return 1
@@ -117,4 +110,3 @@ Notes:
 
 if __name__ == "__main__":
     sys.exit(main())
-
