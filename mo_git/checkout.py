@@ -98,13 +98,15 @@ def get_current_branch():
 def checkout_new_branch_with_alias(long_name, alias=None):
     stash()
     run(["git", "checkout", "-b", long_name])
-    add_alias(long_name, alias)
-    print(f"✔ Created '{long_name}' and alias '{alias}'")
+    if alias:
+        add_alias(long_name, alias)
+        print(f"✔ Created '{long_name}' with alias '{alias}'")
+    else:
+        print(f"✔ Created '{long_name}'")
 
 
 def checkout_branch(long_name_or_alias):
     long_name = load_aliases().get(long_name_or_alias, long_name_or_alias)
-
     stash()
     result = run(["git", "checkout", long_name], capture_output=True)
     if result:

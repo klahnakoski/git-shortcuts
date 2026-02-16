@@ -18,9 +18,7 @@ def save_alias(alias_map):
     File(ALIAS_FILE).write(value2json(alias_map, pretty=True))
 
 
-def add_alias(long_name, alias=None):
-    if not alias:
-        return
+def add_alias(long_name, alias):
     alias_map = load_aliases()
     alias_map[alias] = long_name
     save_alias(alias_map)

@@ -6,7 +6,6 @@ Handles merge and checkout operations with branch aliases.
 import argparse
 import sys
 
-from mo_git.aliases import load_aliases
 from mo_git.merge import merge
 from mo_git.checkout import checkout_branch, checkout_new_branch_with_alias
 
