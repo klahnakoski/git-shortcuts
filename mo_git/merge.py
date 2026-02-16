@@ -2,7 +2,7 @@
 import subprocess
 import sys
 
-from mo_files import add_suffix, File
+from mo_files import File
 
 from mo_git.utils import run
 
@@ -13,28 +13,76 @@ def sanitize_branch_token(branch):
     return "".join(ch if ch in allowed else "-" for ch in token) or "branch"
 
 
-def conflicted_stage3_blobs():
-    out = run(["git", "ls-files", "-u"], capture_output=True)
-    result = {}
-    for line in out.splitlines():
-        try:
-            meta, path = line.split("\t", 1)
-            mode, obj, stage = meta.split()
-            if stage == "3":  # theirs
-                result[path] = obj
-        except ValueError:
-            continue
-    return result
-
-
 def conflicted_paths():
     out = run(["git", "diff", "--name-only", "--diff-filter=U"], capture_output=True)
     return [line.strip() for line in out.splitlines() if line.strip()]
 
 
-def write_blob_to_path(blob_sha, target_path):
-    content = subprocess.run(["git", "show", blob_sha], capture_output=True, text=False).stdout
-    File(target_path).write_bytes(content)
+def split_conflict_markers(path):
+    """
+    Split a file with conflict markers into main (ours) and feature (theirs) versions.
+    Returns (main_content, feature_content) as bytes.
+    Removes conflict markers and keeps clean hunks in both versions.
+    """
+    content = File(path).read_bytes()
+
+    main_parts = []
+    feature_parts = []
+    i = 0
+
+    while i < len(content):
+        # Look for conflict marker start
+        conflict_start = content.find(b"\n<<<<<<<", i)
+
+        if conflict_start < 0:
+            # No more conflicts - copy rest as-is to both
+            main_parts.append(content[i:])
+            feature_parts.append(content[i:])
+            break
+
+        # Copy non-conflicting content before this conflict
+        main_parts.append(content[i:conflict_start + 1])  # include the newline
+        feature_parts.append(content[i:conflict_start + 1])
+
+        # Find the separator markers
+        conflict_start += 1  # move past the newline
+        ours_end = content.find(b"\n=======", conflict_start)
+
+        if ours_end < 0:
+            # Malformed conflict, just copy rest
+            main_parts.append(content[conflict_start:])
+            feature_parts.append(content[conflict_start:])
+            break
+
+        theirs_end = content.find(b"\n>>>>>>>", ours_end)
+
+        if theirs_end < 0:
+            # Malformed conflict
+            main_parts.append(content[conflict_start:])
+            feature_parts.append(content[conflict_start:])
+            break
+
+        # Extract ours and theirs content (without the markers)
+        ours_content_start = conflict_start + 8 + content[conflict_start + 8:ours_end].find(b"\n") + 1
+        ours_content = content[ours_content_start:ours_end]
+
+        theirs_content_start = ours_end + 8 + content[ours_end + 8:theirs_end].find(b"\n") + 1
+        theirs_content = content[theirs_content_start:theirs_end]
+
+        # Add to appropriate versions
+        main_parts.append(ours_content)
+        feature_parts.append(theirs_content)
+
+        # Skip to end of conflict marker and newline
+        marker_end = theirs_end + content[theirs_end:].find(b"\n")
+        if marker_end == theirs_end - 1:
+            marker_end = len(content)
+        else:
+            marker_end += 1
+
+        i = marker_end
+
+    return b"".join(main_parts), b"".join(feature_parts)
 
 
 def merge(branch):
@@ -57,21 +105,23 @@ def merge(branch):
 
     print("\n⚠ Merge conflicts detected.")
 
-    stage3 = conflicted_stage3_blobs()
     branch_token = sanitize_branch_token(branch)
     wrote, skipped = [], []
 
+    # Process each conflicted file
     for path in conflicted:
-        blob_sha = stage3.get(path)
-        if not blob_sha:
-            skipped.append((path, "no stage-3 blob found"))
-            continue
-        target = add_suffix(path, branch_token)
         try:
-            write_blob_to_path(blob_sha, target)  # overwrites old copy
+            main_content, feature_content = split_conflict_markers(path)
+
+            # Write feature copy with feature's version
+            target = path.add_suffix(branch_token)
+            File(target).write_bytes(feature_content)
             wrote.append((path, str(target.rel_path)))
+
+            # Write main file with our version (clean, no markers)
+            File(path).write_bytes(main_content)
         except Exception as e:
-            skipped.append((path, f"write error: {e!r}"))
+            skipped.append((path, f"error: {e!r}"))
 
     if wrote:
         print("  Wrote branch copies (overwrote if existed):")
@@ -82,12 +132,10 @@ def merge(branch):
         for src, reason in skipped:
             print(f"    • {src}  ({reason})")
 
-    # Resolve all conflicted files by keeping ours and stage them
+    # Stage all resolved files
     for path in conflicted:
-        subprocess.run(["git", "checkout", "--ours", path], check=True)
         subprocess.run(["git", "add", path], check=True)
 
-    # Stage the branch copies
     for _, dst in wrote:
         subprocess.run(["git", "add", dst], check=True)
 
@@ -95,3 +143,8 @@ def merge(branch):
     subprocess.run(["git", "commit", "-m", f"merge {branch}"], check=True)
     print("\n✓ Merge completed.")
     return 1
+
+
+
+
+
