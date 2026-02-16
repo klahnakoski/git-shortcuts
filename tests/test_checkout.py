@@ -73,6 +73,31 @@ class TestCheckout(TestCase):
         self.assertEqual(staged_file.read(), "This file should be staged\n")
         self.assertEqual(unstaged_file.read(), "This file should be unstaged\n")
 
+    def test_checkout_nonexistent_branch_does_nothing(self):
+        # Get current branch
+        current_branch = self.sh(["git", "rev-parse", "--abbrev-ref", "HEAD"]).stdout.strip()
+        self.assertEqual(current_branch, "main")
+
+        # Create a file and stage it
+        test_file = self.repo / "test.txt"
+        test_file.write("original content\n")
+        self.sh(["git", "add", "test.txt"])
+
+        # Verify it's staged
+        self.assertTrue(self.is_staged("test.txt"), "test.txt should be staged")
+
+        # Try to checkout non-existent branch
+        checkout_branch("does-not-exist")
+
+        # Verify we're still on main branch
+        still_on_branch = self.sh(["git", "rev-parse", "--abbrev-ref", "HEAD"]).stdout.strip()
+        self.assertEqual(still_on_branch, "main", "Should still be on main branch")
+
+        # Verify file still exists and is still staged
+        self.assertTrue(test_file.exists, "test.txt should still exist")
+        self.assertTrue(self.is_staged("test.txt"), "test.txt should still be staged")
+        self.assertEqual(test_file.read(), "original content\n", "Content should be unchanged")
+
     def sh(self, args, check=True):
         """Run a shell command in cwd and return CompletedProcess."""
         return subprocess.run(args, cwd=self.repo.os_path, check=check, text=True, capture_output=True)

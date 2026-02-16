@@ -107,10 +107,14 @@ def checkout_new_branch_with_alias(long_name, alias=None):
 
 def checkout_branch(long_name_or_alias):
     long_name = load_aliases().get(long_name_or_alias, long_name_or_alias)
+
     stash()
-    result = run(["git", "checkout", long_name], capture_output=True)
+    result = run(["git", "checkout", long_name], capture_output=True, check=False)
     if result:
         print(f"✔ Switched to branch '{long_name}'")
+        stash_apply(long_name)
     else:
         print(f"✘ Branch '{long_name}' does not exist.")
-    stash_apply(long_name)
+        # Re-apply stash to current branch since checkout failed
+        current_branch = get_current_branch()
+        stash_apply(current_branch)
