@@ -10,10 +10,7 @@ from mo_git.utils import run
 # Regex pattern for git conflict markers:
 # <<<<<<<\n...ours...\n=======\n...theirs...\n>>>>>>>
 # Using DOTALL to match across newlines
-CONFLICTS = re.compile(
-    rb'<<<<<<<[^\n]*\n(.*?)\n=======\n(.*?)\n>>>>>>>[^\n]*',
-    re.DOTALL,
-)
+CONFLICTS = re.compile(rb"<<<<<<<[^\n]*\n(.*?)\n=======\n(.*?)\n>>>>>>>[^\n]*", re.DOTALL,)
 
 
 def sanitize_branch_token(branch):
@@ -41,8 +38,8 @@ def split_conflict_markers(path):
 
     # Find all conflict marker matches
     for match in CONFLICTS.finditer(content):
-        main_parts.append(content[last_end:match.start()])
-        feature_parts.append(content[last_end:match.start()])
+        main_parts.append(content[last_end : match.start()])
+        feature_parts.append(content[last_end : match.start()])
         main_parts.append(match.group(1))
         feature_parts.append(match.group(2))
         last_end = match.end()
@@ -112,4 +109,3 @@ def merge(branch):
     subprocess.run(["git", "commit", "-m", f"merge {branch}"], check=True)
     print("\n✓ Merge completed.")
     return 1
-
