@@ -192,20 +192,56 @@ class TestMerge(TestCase):
         content_init = textwrap.dedent("""\
             # Header
             
+            intro_line_1
+            intro_line_2
+            intro_line_3
+            intro_line_4
+            intro_line_5
+            intro_line_6
+            intro_line_7
+            intro_line_8
+            
             section_1_line_1
             section_1_line_2
+            
+            middle_block_1
+            middle_block_2
+            middle_block_3
+            middle_block_4
+            middle_block_5
+            middle_block_6
+            middle_block_7
+            middle_block_8
             
             section_2_line_1
             section_2_line_2
             
+            spacer_a
+            spacer_b
+            spacer_c
+            spacer_d
+            spacer_e
+            spacer_f
+            spacer_g
+            spacer_h
+            
             section_3_line_1
             section_3_line_2
+            
+            outro_1
+            outro_2
+            outro_3
+            outro_4
+            outro_5
+            outro_6
+            outro_7
+            outro_8
             
             # Footer
         """)
 
         # Feature branch: modify sections 1 and 3
-        self.sh(["git", "checkout", "-b", "feature"])
+        self.sh(["git", "checkout", "main"])
         (self.repo / "multi.txt").write(content_init)
         self.sh(["git", "add", "-A"])
         self.sh(["git", "commit", "-m", "init multi.txt"])
@@ -213,17 +249,54 @@ class TestMerge(TestCase):
         content_feature = textwrap.dedent("""\
             # Header
             
+            intro_line_1
+            intro_line_2
+            intro_line_3
+            intro_line_4
+            intro_line_5
+            intro_line_6
+            intro_line_7
+            intro_line_8
+            
             section_1_line_1_FEATURE
             section_1_line_2_FEATURE
+            
+            middle_block_1
+            middle_block_2
+            middle_block_3
+            middle_block_4
+            middle_block_5
+            middle_block_6
+            middle_block_7
+            middle_block_8
             
             section_2_line_1
             section_2_line_2
             
+            spacer_a
+            spacer_b
+            spacer_c
+            spacer_d
+            spacer_e
+            spacer_f
+            spacer_g
+            spacer_h
+            
             section_3_line_1_FEATURE
             section_3_line_2_FEATURE
             
+            outro_1
+            outro_2
+            outro_3
+            outro_4
+            outro_5
+            outro_6
+            outro_7
+            outro_8
+            
             # Footer
         """)
+        self.sh(["git", "checkout", "-b", "feature"])
         (self.repo / "multi.txt").write(content_feature)
         self.sh(["git", "add", "-A"])
         self.sh(["git", "commit", "-m", "feature: modify sections 1 and 3"])
@@ -233,14 +306,50 @@ class TestMerge(TestCase):
         content_main = textwrap.dedent("""\
             # Header
             
+            intro_line_1
+            intro_line_2
+            intro_line_3
+            intro_line_4
+            intro_line_5
+            intro_line_6
+            intro_line_7
+            intro_line_8
+            
             section_1_line_1
             section_1_line_2
+            
+            middle_block_1
+            middle_block_2
+            middle_block_3
+            middle_block_4
+            middle_block_5
+            middle_block_6
+            middle_block_7
+            middle_block_8
             
             section_2_line_1_MAIN
             section_2_line_2_MAIN
             
+            spacer_a
+            spacer_b
+            spacer_c
+            spacer_d
+            spacer_e
+            spacer_f
+            spacer_g
+            spacer_h
+            
             section_3_line_1_MAIN
             section_3_line_2_MAIN
+            
+            outro_1
+            outro_2
+            outro_3
+            outro_4
+            outro_5
+            outro_6
+            outro_7
+            outro_8
             
             # Footer
         """)
