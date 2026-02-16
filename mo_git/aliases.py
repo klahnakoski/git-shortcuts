@@ -1,24 +1,24 @@
 import json
 import os
 
+from mo_files import File
+from mo_json import value2json
+
 ALIAS_FILE = ".git/hit-aliases.json"
 
 
 def load_aliases():
-    if os.path.exists(ALIAS_FILE):
-        with open(ALIAS_FILE) as f:
-            return json.load(f)
-    return {}
+    try:
+        return File(ALIAS_FILE).read_json()
+    except Exception as cause:
+        return {}
 
 
 def save_alias(alias_map):
-    os.makedirs(os.path.dirname(ALIAS_FILE), exist_ok=True)
-    with open(ALIAS_FILE, "w") as f:
-        json.dump(alias_map, f, indent=2)
+    File(ALIAS_FILE).write(value2json(alias_map, pretty=True))
 
 
 def add_alias(long_name, alias):
     alias_map = load_aliases()
-    alias_map[long_name] = alias
+    alias_map[alias] = long_name
     save_alias(alias_map)
-    print(f"Alias '{alias}' added for '{long_name}'")
