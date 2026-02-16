@@ -14,7 +14,7 @@ def sanitize_branch_token(branch):
 
 
 def conflicted_stage3_blobs():
-    out = run(["git", "ls-files", "-u"]).stdout
+    out = run(["git", "ls-files", "-u"], capture_output=True)
     result = {}
     for line in out.splitlines():
         try:
@@ -28,12 +28,12 @@ def conflicted_stage3_blobs():
 
 
 def conflicted_paths():
-    out = run(["git", "diff", "--name-only", "--diff-filter=U"]).stdout
+    out = run(["git", "diff", "--name-only", "--diff-filter=U"], capture_output=True)
     return [line.strip() for line in out.splitlines() if line.strip()]
 
 
 def write_blob_to_path(blob_sha, target_path):
-    content = run(["git", "show", blob_sha]).stdout.encode("utf-8", "surrogatepass")
+    content = subprocess.run(["git", "show", blob_sha], capture_output=True, text=False).stdout
     File(target_path).write_bytes(content)
 
 
@@ -69,11 +69,10 @@ def merge(branch):
         target = add_suffix(path, branch_token)
         try:
             write_blob_to_path(blob_sha, target)  # overwrites old copy
-            wrote.append((path, str(target)))
+            wrote.append((path, str(target.rel_path)))
         except Exception as e:
             skipped.append((path, f"write error: {e!r}"))
 
-    print("\n⚠ Merge conflicts detected.")
     if wrote:
         print("  Wrote branch copies (overwrote if existed):")
         for src, dst in wrote:
@@ -82,4 +81,18 @@ def merge(branch):
         print("  Skipped:")
         for src, reason in skipped:
             print(f"    • {src}  ({reason})")
+
+    # Resolve all conflicted files by keeping ours and stage them
+    for path in conflicted:
+        subprocess.run(["git", "checkout", "--ours", path], check=True)
+        subprocess.run(["git", "add", path], check=True)
+
+    # Stage the branch copies
+    for _, dst in wrote:
+        subprocess.run(["git", "add", dst], check=True)
+
+    # Complete the merge
+    subprocess.run(["git", "commit", "-m", f"merge {branch}"], check=True)
+    print("\n✓ Merge completed.")
+    return 1
 
