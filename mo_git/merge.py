@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
+import re
 import subprocess
 import sys
 
 from mo_files import File
 
 from mo_git.utils import run
+
+# Regex pattern for git conflict markers:
+# <<<<<<<\n...ours...\n=======\n...theirs...\n>>>>>>>
+# Using DOTALL to match across newlines
+CONFLICTS = re.compile(rb'<<<<<<<[^\n]*\n(.*?)\n=======\n(.*?)\n>>>>>>>[^\n]*\n', re.DOTALL)
 
 
 def sanitize_branch_token(branch):
@@ -21,66 +27,26 @@ def conflicted_paths():
 def split_conflict_markers(path):
     """
     Split a file with conflict markers into main (ours) and feature (theirs) versions.
+    Uses regex to match (ours, theirs) conflict triples.
     Returns (main_content, feature_content) as bytes.
-    Removes conflict markers and keeps clean hunks in both versions.
     """
     content = File(path).read_bytes()
 
     main_parts = []
     feature_parts = []
-    i = 0
+    last_end = 0
 
-    while i < len(content):
-        # Look for conflict marker start
-        conflict_start = content.find(b"\n<<<<<<<", i)
+    # Find all conflict marker matches
+    for match in CONFLICTS.finditer(content):
+        main_parts.append(content[last_end:match.start()])
+        feature_parts.append(content[last_end:match.start()])
+        main_parts.append(match.group(1))
+        feature_parts.append(match.group(2))
+        last_end = match.end()
 
-        if conflict_start < 0:
-            # No more conflicts - copy rest as-is to both
-            main_parts.append(content[i:])
-            feature_parts.append(content[i:])
-            break
-
-        # Copy non-conflicting content before this conflict
-        main_parts.append(content[i:conflict_start + 1])  # include the newline
-        feature_parts.append(content[i:conflict_start + 1])
-
-        # Find the separator markers
-        conflict_start += 1  # move past the newline
-        ours_end = content.find(b"\n=======", conflict_start)
-
-        if ours_end < 0:
-            # Malformed conflict, just copy rest
-            main_parts.append(content[conflict_start:])
-            feature_parts.append(content[conflict_start:])
-            break
-
-        theirs_end = content.find(b"\n>>>>>>>", ours_end)
-
-        if theirs_end < 0:
-            # Malformed conflict
-            main_parts.append(content[conflict_start:])
-            feature_parts.append(content[conflict_start:])
-            break
-
-        # Extract ours and theirs content (without the markers)
-        ours_content_start = conflict_start + 8 + content[conflict_start + 8:ours_end].find(b"\n") + 1
-        ours_content = content[ours_content_start:ours_end]
-
-        theirs_content_start = ours_end + 8 + content[ours_end + 8:theirs_end].find(b"\n") + 1
-        theirs_content = content[theirs_content_start:theirs_end]
-
-        # Add to appropriate versions
-        main_parts.append(ours_content)
-        feature_parts.append(theirs_content)
-
-        # Skip to end of conflict marker and newline
-        marker_end = theirs_end + content[theirs_end:].find(b"\n")
-        if marker_end == theirs_end - 1:
-            marker_end = len(content)
-        else:
-            marker_end += 1
-
-        i = marker_end
+    # Add remaining content after last conflict
+    main_parts.append(content[last_end:])
+    feature_parts.append(content[last_end:])
 
     return b"".join(main_parts), b"".join(feature_parts)
 
@@ -114,8 +80,8 @@ def merge(branch):
             main_content, feature_content = split_conflict_markers(path)
 
             # Write feature copy with feature's version
-            target = path.add_suffix(branch_token)
-            File(target).write_bytes(feature_content)
+            target = File(path).add_suffix(branch_token)
+            target.write_bytes(feature_content)
             wrote.append((path, str(target.rel_path)))
 
             # Write main file with our version (clean, no markers)

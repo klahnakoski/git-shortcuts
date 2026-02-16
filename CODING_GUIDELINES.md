@@ -70,7 +70,61 @@ def stash_apply(long_name):
     # ...
 ```
 
-### 3. Guard Clauses Over If-Else Pyramids
+### 3. Use Regex for Pattern Matching
+
+**If you find yourself doing multiple `.find()` and index arithmetic to extract data, use regex instead.**
+
+#### ✅ GOOD - Regex for Complex Patterns
+```python
+import re
+
+# Extract conflict markers from a file with one regex call
+pattern = rb'<<<<<<<[^\n]*\n(.*?)\n=======\n(.*?)\n>>>>>>>[^\n]*\n'
+
+for match in re.finditer(pattern, content):
+    ours_content = match.group(1)
+    theirs_content = match.group(2)
+    # ... process
+```
+
+#### ❌ BAD - Manual Index Arithmetic
+```python
+# Fragile and hard to understand
+i = 0
+while i < len(content):
+    conflict_start = content.find(b"\n<<<<<<<", i)
+    if conflict_start < 0:
+        break
+    ours_end = content.find(b"\n=======", conflict_start)
+    theirs_end = content.find(b"\n>>>>>>>", ours_end)
+    ours_start = conflict_start + 8 + content[conflict_start + 8:ours_end].find(b"\n") + 1
+    ours_content = content[ours_start:ours_end]
+    # ... more index math
+    i = theirs_end + content[theirs_end:].find(b"\n") + 1
+```
+
+### Benefits of Regex Over Manual Indexing:
+
+- **Clearer intent** - Pattern shows what you're looking for
+- **Less error-prone** - No off-by-one errors from index arithmetic
+- **More maintainable** - Pattern is explicit, easier to modify
+- **Better performance** - Regex engine is optimized
+- **Easier to debug** - Print the pattern, not complicated indices
+
+### When to Use Regex:
+
+✓ Pattern matching (start/end markers, delimiters)
+✓ Extracting data from structured text
+✓ Multiple find operations on same string
+✓ Complex conditionals on string positions
+
+### When NOT to Use Regex:
+
+✗ Simple single substring lookup - use `.find()`
+✗ Splitting on known delimiter - use `.split()`
+✗ Case-insensitive comparison - use `.lower()`
+
+## 3. Guard Clauses Over If-Else Pyramids
 
 Use guard clauses at the start of functions to handle edge cases and invalid states.
 
