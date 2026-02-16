@@ -1,0 +1,7 @@
+# Production dependencies
+mo-files>=6.0.0
+
+# Development dependencies (install with: pip install -e ".[dev]")
+# pytest>=7.0.0
+# pytest-cov>=4.0.0
+

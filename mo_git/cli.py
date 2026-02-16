@@ -12,10 +12,10 @@ from mo_git.checkout import checkout_branch, checkout_new_branch_with_alias
 
 def main():
     parser = argparse.ArgumentParser(
-        prog="mo-git",
-        description="Enhanced git workflow utilities",
+        prog='hit',
+        description='Enhanced git workflow utilities',
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=get_examples(),
+        epilog=get_examples()
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
@@ -77,26 +77,26 @@ def get_examples():
     return """
 Examples:
   # Merge with conflict resolution
-  mo-git merge feature/new-api
+  hit merge feature/new-api
 
   # Create branch without alias
-  mo-git checkout -b feature/user-authentication
+  hit checkout -b feature/user-authentication
 
   # Create branch with alias (any order)
-  mo-git checkout -b feature/user-auth --as ua
-  mo-git checkout --as ua -b feature/user-auth
+  hit checkout -b feature/user-auth --as ua
+  hit checkout --as ua -b feature/user-auth
 
   # Create from specific base (any order)
-  mo-git checkout -b hotfix/security-patch --from main
-  mo-git checkout --from main -b hotfix/security-patch
+  hit checkout -b hotfix/security-patch --from main
+  hit checkout --from main -b hotfix/security-patch
 
   # Create with alias and base (any order)
-  mo-git checkout -b feature/api-v2 --as api2 --from develop
-  mo-git checkout --as api2 --from develop -b feature/api-v2
-  mo-git checkout --from develop -b feature/api-v2 --as api2
+  hit checkout -b feature/api-v2 --as api2 --from develop
+  hit checkout --as api2 --from develop -b feature/api-v2
+  hit checkout --from develop -b feature/api-v2 --as api2
 
   # Switch to branch using alias
-  mo-git checkout ua
+  hit checkout ua
 
 Notes:
   - Merge creates .branch-name copies of conflicted files (their version)

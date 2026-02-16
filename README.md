@@ -1,7 +1,37 @@
 # More GIT
 
-Some git shortcuts
+Some git shortcuts for better workflow management.
 
+## Installation
+
+### Development Installation (Recommended)
+
+Install in editable mode so changes to the code are immediately reflected:
+
+```bash
+# Clone the repository
+git clone https://github.com/klahnakoski/mo-git.git
+cd mo-git
+
+# Install in development mode
+pip install -e .
+```
+
+This creates a `hit` command available system-wide.
+
+### Regular Installation
+
+```bash
+pip install mo-git
+```
+
+### Verify Installation
+
+```bash
+hit --help
+```
+
+## Usage
 
 ### Safe checkout
 
@@ -21,16 +51,56 @@ hit merge <branch>
 
 ### Alias branch names
 
-Corporate repositories often have long branch names that are difficult to remember and type.  You can create aliases for these branch names to make it easier to work with them.
+Corporate repositories often have long branch names that are difficult to remember and type. You can create aliases for these branch names to make it easier to work with them.
+
+Create a new branch with an alias:
 
 ```commandline
-hit alias <branch> as <alias> 
+hit checkout -b feature/user-authentication --as ua
 ```
 
-you can also do this during checkout:
+Or create from a specific base branch:
 
 ```commandline
-hit checkout [-bB] <branch> as <alias>
+hit checkout -b hotfix/security-patch --as hsp --from main
+```
+
+Then checkout using the alias:
+
+```commandline
+hit checkout ua
+```
+
+## Features
+
+- **Smart Stashing**: Automatically stashes changes when switching branches, including untracked files
+- **Staged/Unstaged Preservation**: Restores files to their exact staged/unstaged state after switching
+- **Conflict Resolution**: Creates `.branch-name` copies of conflicted files for easy comparison
+- **Branch Aliases**: Short aliases for long branch names
+- **Flexible Syntax**: Arguments can be in any order (e.g., `--as alias --from base -b name`)
+
+## Examples
+
+```bash
+# Create branch without alias
+hit checkout -b feature/new-feature
+
+# Create branch with alias
+hit checkout -b feature/user-authentication --as ua
+
+# Create from specific base branch
+hit checkout -b hotfix/critical --from production
+
+# All options together (any order)
+hit checkout -b feature/api-v2 --as api2 --from develop
+hit checkout --as api2 --from develop -b feature/api-v2
+
+# Switch to existing branch
+hit checkout main
+hit checkout ua  # using alias
+
+# Merge with automatic conflict resolution
+hit merge feature/new-api
 ```
 
 
