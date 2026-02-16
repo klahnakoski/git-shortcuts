@@ -1,0 +1,120 @@
+#!/usr/bin/env python3
+"""
+CLI interface for mo-git commands.
+Handles merge and checkout operations with branch aliases.
+"""
+import argparse
+import sys
+
+from mo_git.aliases import load_aliases
+from mo_git.merge import merge
+from mo_git.checkout import checkout_branch, checkout_new_branch_with_alias
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        prog='mo-git',
+        description='Enhanced git workflow utilities',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=get_examples()
+    )
+
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
+
+    # Merge command
+    merge_parser = subparsers.add_parser(
+        'merge',
+        help='Merge branch with smart conflict resolution'
+    )
+    merge_parser.add_argument('branch', help='Branch to merge into current branch')
+
+    # Checkout command
+    checkout_parser = subparsers.add_parser(
+        'checkout',
+        help='Switch branches with smart stashing'
+    )
+    checkout_parser.add_argument('branch', help='Branch name or alias to checkout')
+    checkout_parser.add_argument('-b', '--new-branch', metavar='NAME',
+                                help='Create new branch with NAME')
+    checkout_parser.add_argument('--as', dest='alias', metavar='ALIAS',
+                                help='Alias for the new branch')
+    checkout_parser.add_argument('--from', dest='base', metavar='BASE',
+                                help='Base branch to branch from (name or alias)')
+
+    args = parser.parse_args()
+
+    if not args.command:
+        parser.print_help()
+        return 1
+
+    if args.command == 'merge':
+        return handle_merge(args)
+
+    if args.command == 'checkout':
+        return handle_checkout(args)
+
+    return 1
+
+
+def handle_merge(args):
+    """Merge a branch with conflict resolution that creates branch copies."""
+    return merge(args.branch)
+
+
+def handle_checkout(args):
+    """Checkout branch with stash/unstash and alias support."""
+    # Create new branch
+    if args.new_branch:
+        long_name = args.new_branch
+
+        # If base branch specified, checkout base first
+        if args.base:
+            checkout_branch(args.base)
+
+        # Create branch with or without alias
+        checkout_new_branch_with_alias(long_name, args.alias)
+
+        return 0
+
+    # Checkout existing branch (or alias)
+    checkout_branch(args.branch)
+    return 0
+
+
+def get_examples():
+    return """
+Examples:
+  # Merge with conflict resolution
+  mo-git merge feature/new-api
+
+  # Create branch without alias
+  mo-git checkout -b feature/user-authentication
+
+  # Create branch with alias (any order)
+  mo-git checkout -b feature/user-auth --as ua
+  mo-git checkout --as ua -b feature/user-auth
+
+  # Create from specific base (any order)
+  mo-git checkout -b hotfix/security-patch --from main
+  mo-git checkout --from main -b hotfix/security-patch
+
+  # Create with alias and base (any order)
+  mo-git checkout -b feature/api-v2 --as api2 --from develop
+  mo-git checkout --as api2 --from develop -b feature/api-v2
+  mo-git checkout --from develop -b feature/api-v2 --as api2
+
+  # Switch to branch using alias
+  mo-git checkout ua
+
+Notes:
+  - Merge creates .branch-name copies of conflicted files (their version)
+  - Merge keeps ours version in original files and auto-commits
+  - Checkout automatically stashes/unstashes changes
+  - Checkout preserves staged/unstaged file status
+  - Branch aliases are stored for quick access
+"""
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+

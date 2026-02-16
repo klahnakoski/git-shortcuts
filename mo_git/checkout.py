@@ -106,7 +106,7 @@ def get_current_branch():
     return run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True)
 
 
-def checkout_new_branch_with_alias(long_name, alias):
+def checkout_new_branch_with_alias(long_name, alias=None):
     stash()
     run(["git", "checkout", "-b", long_name])
     add_alias(long_name, alias)
