@@ -170,9 +170,120 @@ class TestMerge(TestCase):
         self.assertFalse(self.in_merge_state())
         self.assertEqual(self.git_log_body(), "merge feat")
 
-    def sh(self, args, check=True):
-        """Run a shell command in cwd and return CompletedProcess."""
-        return subprocess.run(args, cwd=self.repo.os_path, check=check, text=True, capture_output=True)
+    def test_partial_merge_conflict_with_clean_hunks(self):
+        """
+        Test scenario where a single file has multiple change hunks.
+        Some hunks merge cleanly (no conflict), others have conflicts.
+
+        Expected behavior (what we want to implement):
+        - Clean hunks should be merged automatically
+        - Only conflicting hunks use --ours (keep our version)
+        - Branch copy contains the feature version for reference on conflicts
+        - No conflict markers in final file
+
+        This test verifies:
+        1. No merge conflict state after merge completes
+        2. Clean hunks are merged (section 1 from feature, section 2 from main)
+        3. Conflicting hunks use --ours (section 3 from main)
+        4. Feature copy has the feature branch version for comparison
+        5. No conflict markers in main file
+        """
+        # Create initial file with sections
+        content_init = textwrap.dedent("""\
+            # Header
+            
+            section_1_line_1
+            section_1_line_2
+            
+            section_2_line_1
+            section_2_line_2
+            
+            section_3_line_1
+            section_3_line_2
+            
+            # Footer
+        """)
+
+        # Feature branch: modify sections 1 and 3
+        self.sh(["git", "checkout", "-b", "feature"])
+        (self.repo / "multi.txt").write(content_init)
+        self.sh(["git", "add", "-A"])
+        self.sh(["git", "commit", "-m", "init multi.txt"])
+
+        content_feature = textwrap.dedent("""\
+            # Header
+            
+            section_1_line_1_FEATURE
+            section_1_line_2_FEATURE
+            
+            section_2_line_1
+            section_2_line_2
+            
+            section_3_line_1_FEATURE
+            section_3_line_2_FEATURE
+            
+            # Footer
+        """)
+        (self.repo / "multi.txt").write(content_feature)
+        self.sh(["git", "add", "-A"])
+        self.sh(["git", "commit", "-m", "feature: modify sections 1 and 3"])
+
+        # Main branch: modify sections 2 and 3 (section 3 conflicts with feature)
+        self.sh(["git", "checkout", "main"])
+        content_main = textwrap.dedent("""\
+            # Header
+            
+            section_1_line_1
+            section_1_line_2
+            
+            section_2_line_1_MAIN
+            section_2_line_2_MAIN
+            
+            section_3_line_1_MAIN
+            section_3_line_2_MAIN
+            
+            # Footer
+        """)
+        (self.repo / "multi.txt").write(content_main)
+        self.sh(["git", "add", "-A"])
+        self.sh(["git", "commit", "-m", "main: modify sections 2 and 3"])
+
+        # Merge feature into main
+        merge("feature")
+
+        # Verify we're not in merge state (merge completed)
+        self.assertFalse(self.in_merge_state(), "Should not be in merge state after completion")
+
+        # Verify feature copy exists with feature's version for reference
+        feature_copy = self.repo / "multi.feature.txt"
+        self.assertTrue(feature_copy.exists, "Feature copy should exist for conflict reference")
+        feature_content = feature_copy.read()
+        self.assertIn("section_1_line_1_FEATURE", feature_content,
+                      "Feature copy should have feature's section 1")
+        self.assertIn("section_3_line_1_FEATURE", feature_content,
+                      "Feature copy should have feature's section 3")
+
+        # Verify main file has correct merge result:
+        # - Section 1: FEATURE version (clean merge - only feature changed it)
+        # - Section 2: MAIN version (clean merge - only main changed it)
+        # - Section 3: MAIN version (conflict - we keep ours)
+        main_content = (self.repo / "multi.txt").read()
+
+        self.assertIn("section_1_line_1_FEATURE", main_content,
+                      "Section 1: should have feature changes (clean merge)")
+        self.assertIn("section_2_line_1_MAIN", main_content,
+                      "Section 2: should have main changes (clean merge)")
+        self.assertIn("section_3_line_1_MAIN", main_content,
+                      "Section 3: should have main version (conflict resolved with ours)")
+
+        # Should NOT have conflicting markers in main file
+        self.assertNotIn("<<<<<<<", main_content, "No conflict markers should remain")
+        self.assertNotIn(">>>>>>>", main_content, "No conflict markers should remain")
+        self.assertNotIn("=======", main_content, "No conflict markers should remain")
+
+        # Verify merge commit message
+        self.assertEqual(self.git_log_body(), "merge feature")
+
 
 
 
@@ -180,6 +291,9 @@ class TestMerge(TestCase):
     # Helper functions
     # ---------------------------
 
+    def sh(self, args, check=True):
+        """Run a shell command in cwd and return CompletedProcess."""
+        return subprocess.run(args, cwd=self.repo.os_path, check=check, text=True, capture_output=True)
 
 
     def git_log_body(self) -> str:
