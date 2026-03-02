@@ -8,6 +8,7 @@ These guidelines apply to all agents working in this repo.
 - Do not write defensive code; let errors surface.
 - Use regex when multiple `.find()` calls or index math would be needed.
 - Prefer guard clauses over if/else pyramids.
+- Do not add type annotations.
 
 ## Practical Limits
 
