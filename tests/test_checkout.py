@@ -5,7 +5,7 @@ from unittest import TestCase
 
 from mo_files import TempDirectory
 
-from mo_git.checkout import checkout_branch, checkout_new_branch_with_alias
+from mo_git.git.checkout import checkout_branch, checkout_new_branch_with_alias
 
 
 class TestCheckout(TestCase):

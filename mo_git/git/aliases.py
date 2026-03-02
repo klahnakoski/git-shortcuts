@@ -1,6 +1,3 @@
-import json
-import os
-
 from mo_files import File
 from mo_json import value2json
 
