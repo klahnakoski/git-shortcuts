@@ -157,6 +157,7 @@
         "separator": "\n"
     },
     "long_description_content_type": "text/markdown",
+    "name":"mo-git",
     "packages": ["mo_git"],
     "url": "https://github.com/klahnakoski/mo-git",
     "version": "1.705.26062"
