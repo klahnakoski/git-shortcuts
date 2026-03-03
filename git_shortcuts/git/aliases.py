@@ -1,7 +1,7 @@
 from mo_files import File
 from mo_json import value2json
 
-ALIAS_FILE = ".git/hit-aliases.json"
+ALIAS_FILE = ".git/gscut-aliases.json"
 
 
 def load_aliases():
