@@ -9,7 +9,7 @@ import sys
 
 from git_shortcuts.git.merge import merge
 from git_shortcuts.git.checkout import checkout_branch, checkout_new_branch_with_alias
-from git_shortcuts.git.aliases import handle_alias, add_alias
+from git_shortcuts.git.aliases import add_alias
 
 
 def main():
