@@ -48,6 +48,18 @@ Or create from a specific base branch:
 hit checkout -b hotfix/security-patch --as hsp --from main
 ```
 
+Create an alias for an existing branch:
+
+```commandline
+hit alias <branch name> --as <short name>
+```
+
+Or create an alias for the current branch:
+
+```commandline
+hit alias --as <short name>
+```
+
 Then checkout using the alias:
 
 ```commandline
@@ -84,6 +96,12 @@ hit checkout ua  # using alias
 
 # Merge with automatic conflict resolution
 hit merge feature/new-api
+
+# Create alias for existing branch
+hit alias feature/very-long-branch-name --as vlbn
+
+# Create alias for current branch
+hit alias --as cb
 ```
 
 

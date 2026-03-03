@@ -59,7 +59,9 @@ class Session:
         return self.post_json("/pulls", json=from_data(kwargs))
 
     def close_pr(self, pr_number):
-        return http_get_json(self.repo / f"pulls/{pr_number}", method="PATCH", session=self.session, json={"state": "closed"})
+        return http_get_json(
+            self.repo / f"pulls/{pr_number}", method="PATCH", session=self.session, json={"state": "closed"}
+        )
 
     def create_branch_and_pr(self, base_branch, new_branch, title, body=""):
         self.session.create_branch(base_branch, new_branch)

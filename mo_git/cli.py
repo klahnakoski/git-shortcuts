@@ -4,18 +4,20 @@ CLI interface for mo-git commands.
 Handles merge and checkout operations with branch aliases.
 """
 import argparse
+import subprocess
 import sys
 
 from mo_git.git.merge import merge
 from mo_git.git.checkout import checkout_branch, checkout_new_branch_with_alias
+from mo_git.git.aliases import handle_alias, add_alias
 
 
 def main():
     parser = argparse.ArgumentParser(
-        prog='hit',
-        description='Enhanced git workflow utilities',
+        prog="hit",
+        description="Enhanced git workflow utilities",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=get_examples()
+        epilog=get_examples(),
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
@@ -33,6 +35,11 @@ def main():
         "--from", dest="base", metavar="BASE", help="Base branch to branch from (name or alias)"
     )
 
+    # Alias command
+    alias_parser = subparsers.add_parser("alias", help="Create an alias for a branch")
+    alias_parser.add_argument("branch", nargs="?", help="Branch name to alias (defaults to current branch)")
+    alias_parser.add_argument("--as", dest="alias", metavar="ALIAS", required=True, help="Short alias for the branch")
+
     args = parser.parse_args()
 
     if not args.command:
@@ -44,6 +51,9 @@ def main():
 
     if args.command == "checkout":
         return handle_checkout(args)
+
+    if args.command == "alias":
+        return handle_alias(args)
 
     return 1
 
@@ -73,6 +83,23 @@ def handle_checkout(args):
     return 0
 
 
+def handle_alias(args):
+    """Create an alias for an existing branch."""
+    if not args.branch:
+        # Use current branch
+        result = subprocess.run(["git", "branch", "--show-current"], capture_output=True, text=True)
+        args.branch = result.stdout.strip()
+    else:
+        # Check if branch exists
+        result = subprocess.run(["git", "branch", "--list", args.branch], capture_output=True, text=True)
+        if args.branch not in result.stdout:
+            print(f"✘ Error: Branch '{args.branch}' does not exist.")
+            return 1
+    add_alias(args.branch, args.alias)
+    print(f"✔ Alias '{args.alias}' created for branch '{args.branch}'.")
+    return 0
+
+
 def get_examples():
     return """
 Examples:
@@ -97,6 +124,12 @@ Examples:
 
   # Switch to branch using alias
   hit checkout ua
+
+  # Create alias for existing branch
+  hit alias feature/very-long-branch-name --as vlbn
+
+  # Create alias for current branch
+  hit alias --as cb
 
 Notes:
   - Merge creates .branch-name copies of conflicted files (their version)
