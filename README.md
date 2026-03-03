@@ -117,7 +117,7 @@ cd mo-git
 # Install in development mode
 pip install -r tests/requirements.txt
 pip install -r packaging/requirements.txt
-pip-compile packaging/requirements.in -o packaging/requirements.txt
+pip-compile packaging/requirements.txt -o packaging/requirements.txt
 
 
 pip install -e .
