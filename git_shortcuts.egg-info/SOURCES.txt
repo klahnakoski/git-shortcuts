@@ -1,0 +1,12 @@
+LICENSE
+README.md
+setup.py
+git_shortcuts/__init__.py
+git_shortcuts/cli.py
+git_shortcuts/utils.py
+git_shortcuts.egg-info/PKG-INFO
+git_shortcuts.egg-info/SOURCES.txt
+git_shortcuts.egg-info/dependency_links.txt
+git_shortcuts.egg-info/entry_points.txt
+git_shortcuts.egg-info/requires.txt
+git_shortcuts.egg-info/top_level.txt
