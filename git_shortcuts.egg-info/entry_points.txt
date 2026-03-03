@@ -1,2 +1,0 @@
-[console_scripts]
-gscut = git_shortcuts.cli:main
