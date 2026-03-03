@@ -52,7 +52,7 @@ class TestMerge(TestCase):
         self.sh(["git", "add", "-A"])
         self.sh(["git", "commit", "-m", "add main"])
 
-        # run hit merge (should be clean; our script forces merge commit with message "merge feature")
+        # run gscut merge (should be clean; our script forces merge commit with message "merge feature")
         merge("feature")
 
         # verify true merge commit (2 parents) and message

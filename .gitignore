@@ -4,5 +4,8 @@ __pycache__
 *.pyc
 *.pyo
 *.pyd
-*.egginfo
+*.egg-info
+build
 .pytest_cache
+setup.py
+MANIFEST.in
