@@ -17,7 +17,7 @@
     ],
     "description": "Enhanced git workflow utilities with smart conflict resolution and branch management",
     "entry_points": {"console_scripts": ["hit=mo_git.cli:main"]},
-    "extras_require": {"tests": ["pytest", "pip-tools", "mo-testing"]},
+    "extras_require": {"tests": ["pytest>=8.3.5", "pip-tools>=7.5.2", "mo-testing>=8.685.25166"]},
     "include_package_data": true,
     "install_requires": [
                             "keyring", "mo-json-config==5.703.26061",
@@ -157,7 +157,7 @@
         "separator": "\n"
     },
     "long_description_content_type": "text/markdown",
-    "name":"mo-git",
+    "name": "mo-git",
     "packages": ["mo_git"],
     "url": "https://github.com/klahnakoski/mo-git",
     "version": "1.705.26062"

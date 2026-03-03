@@ -7,7 +7,7 @@ setup(
     classifiers=["Development Status :: 3 - Alpha","Intended Audience :: Developers","Topic :: Software Development :: Version Control :: Git","License :: OSI Approved :: MIT License","Programming Language :: Python :: 3.8","Programming Language :: Python :: 3.9","Programming Language :: Python :: 3.10","Programming Language :: Python :: 3.11","Programming Language :: Python :: 3.12","Programming Language :: Python :: 3.13","Programming Language :: Python :: 3.14","Programming Language :: Python :: 3.15"],
     description='Enhanced git workflow utilities with smart conflict resolution and branch management',
     entry_points={"console_scripts":["hit=mo_git.cli:main"]},
-    extras_require={"tests":["pytest","pip-tools","mo-testing"]},
+    extras_require={"tests":["pytest>=8.3.5","pip-tools>=7.5.2","mo-testing>=8.685.25166"]},
     include_package_data=True,
     install_requires=["keyring","mo-json-config==5.703.26061","mo-threads==6.704.26062"],
     license='MPL 2.0',
