@@ -6,27 +6,9 @@ Some Git shortcuts for better workflow management.
 
 You must have git installed and available in your PATH to use this tool.
 
-### Install virtual environment
-
-You may want a standalone virtual environment for this tool, or you can install it globally.  To create a virtual environment off your home directory, run:
-
-```commandline
-python -m venv ~/.venv
-source ~/.venv/bin/activate
-```
-### Install git-shortcuts
-
 ```bash
 pip install git-shortcuts
 ```
-### Add to PATH
-
-If you installed globally, the `gscut` command should already be available. If you installed in a virtual environment, you need to add the virtual environment's `bin` directory to your PATH. For example, if you created a virtual environment at `~/.venv`, you can add the following line to your shell profile (e.g., `~/.bashrc` or `~/.zshrc`):
-
-```commandline
-
-```
-
 
 ### Verify Installation
 

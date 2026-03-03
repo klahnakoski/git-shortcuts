@@ -15,7 +15,7 @@ from git_shortcuts.git.aliases import add_alias
 def main():
     parser = argparse.ArgumentParser(
         prog="gscut",
-        description="Enhanced git workflow utilities",
+        description="Git workflow shortcuts",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=get_examples(),
     )
