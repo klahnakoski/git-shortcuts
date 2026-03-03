@@ -1,11 +1,11 @@
-# More GIT
+# GIT Shortcuts
 
 Some git shortcuts for better workflow management.
 
 ## Installation
 
 ```bash
-pip install mo-git
+pip install git-shortcuts
 ```
 
 ### Verify Installation
@@ -111,8 +111,8 @@ Install in editable mode so changes to the code are immediately reflected:
 
 ```bash
 # Clone the repository
-git clone https://github.com/klahnakoski/mo-git.git
-cd mo-git
+git clone https://github.com/klahnakoski/git-shortcuts.git
+cd git-shortcuts
 
 # Install in development mode
 pip install -r tests/requirements.txt

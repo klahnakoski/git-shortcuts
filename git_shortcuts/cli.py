@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-CLI interface for mo-git commands.
+CLI interface for git-shortcuts commands.
 Handles merge and checkout operations with branch aliases.
 """
 import argparse

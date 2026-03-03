@@ -26,14 +26,14 @@ class TestGithubSession(TestCase):
         # Clone the repo
         token = self.config.token
         owner = self.config.owner
-        url = f"https://{token}@github.com/{owner}/mo-git.git"
+        url = f"https://{token}@github.com/{owner}/git-shortcuts.git"
         self.sh(["git", "clone", url, "."])
 
     def tearDown(self):
         self.repo.__exit__(None, None, None)
 
         # Cleanup branches
-        with github.Session(repo="mo-git", config=self.config) as session:
+        with github.Session(repo="git-shortcuts", config=self.config) as session:
             branches = session.list_branches()
             for branch in branches:
                 if branch.name.startswith(BRANCH_PREFIX):
@@ -59,7 +59,7 @@ class TestGithubSession(TestCase):
         self.sh(["git", "push", "origin", branch_name])
 
         # Open PR
-        with github.Session(repo="mo-git", config=self.config) as session:
+        with github.Session(repo="git-shortcuts", config=self.config) as session:
             pr = session.open_pr(head=branch_name, base="dev", title="Test PR", body="Automated test PR")
             assert pr.number
 

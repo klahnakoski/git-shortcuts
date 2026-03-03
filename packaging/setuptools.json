@@ -33,7 +33,7 @@
             "## Installation",
             "",
             "```bash",
-            "pip install mo-git",
+            "pip install git-shortcuts",
             "```",
             "",
             "### Verify Installation",
@@ -139,8 +139,8 @@
             "",
             "```bash",
             "# Clone the repository",
-            "git clone https://github.com/klahnakoski/mo-git.git",
-            "cd mo-git",
+            "git clone https://github.com/klahnakoski/git-shortcuts.git",
+            "cd git-shortcuts",
             "",
             "# Install in development mode",
             "pip install -r tests/requirements.txt",
@@ -159,6 +159,6 @@
     "long_description_content_type": "text/markdown",
     "name": "git-shortcuts",
     "packages": ["git_shortcuts"],
-    "url": "https://github.com/klahnakoski/mo-git",
+    "url": "https://github.com/klahnakoski/git-shortcuts",
     "version": "1.705.26062"
 }
