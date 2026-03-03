@@ -14,7 +14,7 @@ from git_shortcuts.git.aliases import handle_alias, add_alias
 
 def main():
     parser = argparse.ArgumentParser(
-        prog="hit",
+        prog="gscut",
         description="Enhanced git workflow utilities",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=get_examples(),
@@ -104,32 +104,32 @@ def get_examples():
     return """
 Examples:
   # Merge with conflict resolution
-  hit merge feature/new-api
+  gscut merge feature/new-api
 
   # Create branch without alias
-  hit checkout -b feature/user-authentication
+  gscut checkout -b feature/user-authentication
 
   # Create branch with alias (any order)
-  hit checkout -b feature/user-auth --as ua
-  hit checkout --as ua -b feature/user-auth
+  gscut checkout -b feature/user-auth --as ua
+  gscut checkout --as ua -b feature/user-auth
 
   # Create from specific base (any order)
-  hit checkout -b hotfix/security-patch --from main
-  hit checkout --from main -b hotfix/security-patch
+  gscut checkout -b hotfix/security-patch --from main
+  gscut checkout --from main -b hotfix/security-patch
 
   # Create with alias and base (any order)
-  hit checkout -b feature/api-v2 --as api2 --from develop
-  hit checkout --as api2 --from develop -b feature/api-v2
-  hit checkout --from develop -b feature/api-v2 --as api2
+  gscut checkout -b feature/api-v2 --as api2 --from develop
+  gscut checkout --as api2 --from develop -b feature/api-v2
+  gscut checkout --from develop -b feature/api-v2 --as api2
 
   # Switch to branch using alias
-  hit checkout ua
+  gscut checkout ua
 
   # Create alias for existing branch
-  hit alias feature/very-long-branch-name --as vlbn
+  gscut alias feature/very-long-branch-name --as vlbn
 
   # Create alias for current branch
-  hit alias --as cb
+  gscut alias --as cb
 
 Notes:
   - Merge creates .branch-name copies of conflicted files (their version)

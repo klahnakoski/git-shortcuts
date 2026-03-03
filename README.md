@@ -4,14 +4,34 @@ Some git shortcuts for better workflow management.
 
 ## Installation
 
+You must have git installed and available in your PATH to use this tool.
+
+### Install virtual environment
+
+You may want a standalone virtual environment for this tool, or you can install it globally.  To create a virtual environment off your home directory, run:
+
+```commandline
+python -m venv ~/.venv
+source ~/.venv/bin/activate
+```
+### Install git-shortcuts
+
 ```bash
 pip install git-shortcuts
 ```
+### Add to PATH
+
+If you installed globally, the `gscut` command should already be available. If you installed in a virtual environment, you need to add the virtual environment's `bin` directory to your PATH. For example, if you created a virtual environment at `~/.venv`, you can add the following line to your shell profile (e.g., `~/.bashrc` or `~/.zshrc`):
+
+```commandline
+
+```
+
 
 ### Verify Installation
 
 ```bash
-hit --help
+gscut --help
 ```
 
 ## Usage
@@ -21,7 +41,7 @@ hit --help
 Quickly checkout a branch without worrying about losing work. This is especially useful when you have a lot of uncommitted changes, and you want to switch to another branch to work on something else, but you don't want to lose your changes.
 
 ```commandline
-hit checkout <branch>
+gscut checkout <branch>
 ```
 
 ### Merge without conflicts
@@ -29,7 +49,7 @@ hit checkout <branch>
 Quickly merge a branch without worrying about conflicts.  Conflicted files will be added to the repo with the foreign branch name appended to the filename.  You can resolve conflicts later by comparing the files and selecting the changes you want to keep.
 
 ```commandline
-hit merge <branch>
+gscut merge <branch>
 ```
 
 ### Alias branch names
@@ -39,31 +59,31 @@ Corporate repositories often have long branch names that are difficult to rememb
 Create a new branch with an alias:
 
 ```commandline
-hit checkout -b feature/user-authentication --as ua
+gscut checkout -b feature/user-authentication --as ua
 ```
 
 Or create from a specific base branch:
 
 ```commandline
-hit checkout -b hotfix/security-patch --as hsp --from main
+gscut checkout -b hotfix/security-patch --as hsp --from main
 ```
 
 Create an alias for an existing branch:
 
 ```commandline
-hit alias <branch name> --as <short name>
+gscut alias <branch name> --as <short name>
 ```
 
 Or create an alias for the current branch:
 
 ```commandline
-hit alias --as <short name>
+gscut alias --as <short name>
 ```
 
 Then checkout using the alias:
 
 ```commandline
-hit checkout ua
+gscut checkout ua
 ```
 
 ## Features
@@ -78,30 +98,30 @@ hit checkout ua
 
 ```bash
 # Create branch without alias
-hit checkout -b feature/new-feature
+gscut checkout -b feature/new-feature
 
 # Create branch with alias
-hit checkout -b feature/user-authentication --as ua
+gscut checkout -b feature/user-authentication --as ua
 
 # Create from specific base branch
-hit checkout -b hotfix/critical --from production
+gscut checkout -b hotfix/critical --from production
 
 # All options together (any order)
-hit checkout -b feature/api-v2 --as api2 --from develop
-hit checkout --as api2 --from develop -b feature/api-v2
+gscut checkout -b feature/api-v2 --as api2 --from develop
+gscut checkout --as api2 --from develop -b feature/api-v2
 
 # Switch to existing branch
-hit checkout main
-hit checkout ua  # using alias
+gscut checkout main
+gscut checkout ua  # using alias
 
 # Merge with automatic conflict resolution
-hit merge feature/new-api
+gscut merge feature/new-api
 
 # Create alias for existing branch
-hit alias feature/very-long-branch-name --as vlbn
+gscut alias feature/very-long-branch-name --as vlbn
 
 # Create alias for current branch
-hit alias --as cb
+gscut alias --as cb
 ```
 
 
@@ -123,4 +143,4 @@ pip-compile packaging/requirements.txt -o packaging/requirements.txt
 pip install -e .
 ```
 
-This creates a `hit` command available system-wide.
+This creates a `gscut` command available system-wide.
