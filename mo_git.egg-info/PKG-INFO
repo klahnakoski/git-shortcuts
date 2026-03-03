@@ -1,5 +1,5 @@
 Metadata-Version: 2.4
-Name: mo_git
+Name: mo-git
 Version: 1.705.26062
 Summary: Enhanced git workflow utilities with smart conflict resolution and branch management
 Home-page: https://github.com/klahnakoski/mo-git
@@ -24,9 +24,9 @@ Requires-Dist: keyring
 Requires-Dist: mo-json-config==5.703.26061
 Requires-Dist: mo-threads==6.704.26062
 Provides-Extra: tests
-Requires-Dist: pytest; extra == "tests"
-Requires-Dist: pip-tools; extra == "tests"
-Requires-Dist: mo-testing; extra == "tests"
+Requires-Dist: pytest>=8.3.5; extra == "tests"
+Requires-Dist: pip-tools>=7.5.2; extra == "tests"
+Requires-Dist: mo-testing>=8.685.25166; extra == "tests"
 Dynamic: author
 Dynamic: author-email
 Dynamic: classifier
