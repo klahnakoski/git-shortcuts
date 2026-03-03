@@ -4,25 +4,47 @@
 #
 #    pip-compile --output-file=packaging/requirements.txt packaging/requirements.in
 #
+backports-tarfile==1.2.0
+    # via jaraco-context
+certifi==2026.2.25
+    # via requests
+charset-normalizer==3.4.4
+    # via requests
 hjson==3.1.0
-    # via mo-json
+    # via
+    #   mo-json
+    #   mo-json-config
+idna==3.11
+    # via requests
+importlib-metadata==8.7.1
+    # via keyring
+jaraco-classes==3.4.0
+    # via keyring
+jaraco-context==6.1.0
+    # via keyring
+jaraco-functools==4.4.0
+    # via keyring
+keyring==25.7.0
+    # via -r packaging/requirements.in
 mo-dots==10.685.25166
     # via
     #   mo-files
     #   mo-json
+    #   mo-json-config
     #   mo-kwargs
     #   mo-logs
     #   mo-math
     #   mo-threads
     #   mo-times
-mo-files==6.699.26047
-    # via -r packaging/requirements.in
+mo-files==6.703.26061
+    # via mo-json-config
 mo-future==7.685.25166
     # via
     #   mo-dots
     #   mo-files
     #   mo-imports
     #   mo-json
+    #   mo-json-config
     #   mo-logs
     #   mo-math
     #   mo-threads
@@ -31,14 +53,19 @@ mo-imports==7.685.25166
     # via
     #   mo-dots
     #   mo-logs
-mo-json==6.686.25166
-    # via mo-files
-mo-kwargs==7.685.25166
+mo-json==6.703.26061
+    # via
+    #   mo-files
+    #   mo-json-config
+mo-json-config==5.703.26061
+    # via -r packaging/requirements.in
+mo-kwargs==8.703.26061
     # via mo-logs
-mo-logs==8.685.25166
+mo-logs==8.703.26061
     # via
     #   mo-files
     #   mo-json
+    #   mo-json-config
     #   mo-threads
     #   mo-times
 mo-math==7.685.25166
@@ -46,9 +73,21 @@ mo-math==7.685.25166
     #   mo-files
     #   mo-threads
     #   mo-times
-mo-threads==6.698.25331
+mo-threads==3.123.20293
     # via -r packaging/requirements.in
-mo-times==5.685.25166
+mo-times==5.703.26061
     # via
     #   mo-json
     #   mo-threads
+more-itertools==10.8.0
+    # via
+    #   jaraco-classes
+    #   jaraco-functools
+pywin32-ctypes==0.2.3
+    # via keyring
+requests==2.32.5
+    # via mo-json-config
+urllib3==2.6.3
+    # via requests
+zipp==3.23.0
+    # via importlib-metadata

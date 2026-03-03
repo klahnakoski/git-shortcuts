@@ -1,4 +1,3 @@
-mo-files
 mo-threads
-mo-json-config
-mo-http
+mo-json-config>=5.703.26061
+keyring

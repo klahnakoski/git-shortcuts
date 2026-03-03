@@ -1,6 +1,7 @@
 {
     "github": {
         "url": "https://api.github.com",
+        "owner": "klahnakoski",
         "token": {
             "$ref": "keyring://agent@github.com"
         }
