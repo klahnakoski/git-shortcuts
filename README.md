@@ -1,6 +1,6 @@
-# GIT Shortcuts
+# Git Shortcuts
 
-Some git shortcuts for better workflow management.
+Some Git shortcuts for better workflow management.
 
 ## Installation
 

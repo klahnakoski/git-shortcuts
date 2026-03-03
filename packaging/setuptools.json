@@ -178,7 +178,7 @@
     },
     "long_description_content_type": "text/markdown",
     "name": "git-shortcuts",
-    "packages": ["git_shortcuts"],
+    "packages": ["git_shortcuts", "git_shortcuts.git", "git_shortcuts.github"],
     "url": "https://github.com/klahnakoski/git-shortcuts",
     "version": "1.706.26062"
 }
