@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from mo_git.git.aliases import load_aliases, add_alias
-from mo_git.utils import run
+from git_shortcuts.git.aliases import load_aliases, add_alias
+from git_shortcuts.utils import run
 
 STASH_PREFIX = "stash"
 

@@ -8,7 +8,7 @@ from mo_testing import add_error_reporting
 from mo_threads import Till
 from mo_logs import logger
 
-from mo_git import github
+from git_shortcuts import github
 
 BRANCH_PREFIX = "test_"
 

@@ -5,7 +5,7 @@ import sys
 
 from mo_files import File
 
-from mo_git.utils import run
+from git_shortcuts.utils import run
 
 # Regex pattern for git conflict markers:
 # <<<<<<<\n...ours...\n=======\n...theirs...\n>>>>>>>

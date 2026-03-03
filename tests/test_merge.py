@@ -6,7 +6,7 @@ from unittest import TestCase
 
 from mo_files import TempDirectory, File
 
-from mo_git.git.merge import merge
+from git_shortcuts.git.merge import merge
 
 HERE = Path(__file__).parent.resolve()
 HIT = HERE / "hit_merge.py"  # <-- adjust if your script filename/path differs

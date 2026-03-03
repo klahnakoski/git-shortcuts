@@ -4,7 +4,7 @@ from mo_files import URL
 from mo_logs import logger
 from mo_threads import Till
 from mo_dots import Data, from_data
-from mo_git.utils import http_get_json, http_post_json, http_get
+from git_shortcuts.utils import http_get_json, http_post_json, http_get
 
 
 class Session:
