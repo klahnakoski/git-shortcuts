@@ -1,0 +1,8 @@
+keyring
+mo-json-config==5.703.26061
+mo-threads==6.704.26062
+
+[tests]
+pytest>=8.3.5
+pip-tools>=7.5.2
+mo-testing>=8.685.25166

@@ -1,0 +1,12 @@
+LICENSE
+README.md
+setup.py
+mo_git/__init__.py
+mo_git/cli.py
+mo_git/utils.py
+mo_git.egg-info/PKG-INFO
+mo_git.egg-info/SOURCES.txt
+mo_git.egg-info/dependency_links.txt
+mo_git.egg-info/entry_points.txt
+mo_git.egg-info/requires.txt
+mo_git.egg-info/top_level.txt

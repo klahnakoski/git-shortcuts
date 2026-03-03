@@ -1,3 +1,3 @@
-pytest
-pip-tools
-mo-testing
+pytest>=8.3.5
+pip-tools>=7.5.2
+mo-testing>=8.685.25166

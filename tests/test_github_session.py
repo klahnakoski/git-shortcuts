@@ -1,5 +1,5 @@
 import subprocess
-from unittest import TestCase
+from unittest import TestCase, skip
 
 from mo_files import TempDirectory
 from mo_json_config import get
@@ -13,6 +13,7 @@ from mo_git import github
 BRANCH_PREFIX = "test_"
 
 @add_error_reporting
+@skip("skipping github session test to avoid hitting rate limits during development")
 class TestGithubSession(TestCase):
     def __init__(self, methodName='runTest'):
         super().__init__(methodName)
