@@ -20,11 +20,9 @@ class TestGithubSession(TestCase):
     def __init__(self, methodName='runTest'):
         super().__init__(methodName)
 
-    @classmethod
-    def setUpClass(cls):
-        cls.config = get("file://tests/config.json").github
-
     def setUp(self):
+        if not TestGithubSession.config:
+            TestGithubSession.config = get("file://tests/config.json").github
         self.repo = TempDirectory()
         self.repo.__enter__()
 
