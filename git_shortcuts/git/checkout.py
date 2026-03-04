@@ -1,5 +1,7 @@
 from datetime import datetime
 
+import subprocess
+
 from git_shortcuts.git.aliases import load_aliases, add_alias
 from git_shortcuts.utils import run
 
@@ -10,7 +12,6 @@ def stash():
     # Check if anything to stash
     status = run(["git", "status", "--porcelain"], capture_output=True)
     if not status:
-        print("Nothing to stash.")
         return None
 
     # Create unique label
@@ -97,7 +98,11 @@ def get_current_branch():
 
 def checkout_new_branch_with_alias(long_name, alias=None):
     stash()
-    run(["git", "checkout", "-b", long_name])
+    try:
+        run(["git", "checkout", "-b", long_name], capture_output=True)
+    except subprocess.CalledProcessError as e:
+        print(f"✘ Failed to create branch '{long_name}': {e.stderr.strip()}")
+        return
     if alias:
         add_alias(long_name, alias)
         print(f"✔ Created '{long_name}' with alias '{alias}'")
