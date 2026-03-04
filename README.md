@@ -2,6 +2,11 @@
 
 Some Git shortcuts for better workflow management.
 
+[![PyPI Latest Release](https://img.shields.io/pypi/v/git-shortcuts.svg)](https://pypi.org/project/git-shortcuts/)
+ [![Build Status](https://github.com/klahnakoski/git-shortcuts/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/klahnakoski/git-shortcuts/actions/workflows/build.yml)
+ [![Coverage Status](https://coveralls.io/repos/github/klahnakoski/git-shortcuts/badge.svg?branch=dev)](https://coveralls.io/github/klahnakoski/git-shortcuts?branch=dev)
+[![Downloads](https://static.pepy.tech/badge/git-shortcuts)](https://pepy.tech/project/git-shortcuts)
+
 ## Installation
 
 You must have git installed and available in your PATH to use this tool.
