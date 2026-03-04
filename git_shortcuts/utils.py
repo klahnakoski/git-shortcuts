@@ -6,7 +6,10 @@ from mo_json import json2value, scrub
 
 def run(cmd, check=True, capture_output=False, text=True):
     result = subprocess.run(cmd, check=check, capture_output=capture_output, text=text)
-    return result.stdout.strip() if capture_output else None
+    if capture_output:
+        output = (result.stdout or "") + (result.stderr or "")
+        return output.strip()
+    return None
 
 
 def http_get(url, *, method="GET", session=None, json=None, **kwargs):
@@ -23,5 +26,3 @@ def http_get_json(url, *, method="GET", session=None, json=None, **kwargs):
 
 def http_post_json(url, **kwargs):
     return http_get_json(url, method="POST", **kwargs)
-    return http_get_json(url, method="DELETE", **kwargs)
-    return http_get_json(url, method="PATCH", **kwargs)
