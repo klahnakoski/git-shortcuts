@@ -28,7 +28,7 @@ def main():
 
     # Checkout command
     checkout_parser = subparsers.add_parser("checkout", help="Switch branches with smart stashing")
-    checkout_parser.add_argument("branch", help="Branch name or alias to checkout")
+    checkout_parser.add_argument("branch", nargs='?', metavar="NAME",  help="Branch name or alias to checkout")
     checkout_parser.add_argument("-b", "--new-branch", metavar="NAME", help="Create new branch with NAME")
     checkout_parser.add_argument("--as", dest="alias", metavar="ALIAS", help="Alias for the new branch")
     checkout_parser.add_argument(
@@ -79,6 +79,9 @@ def handle_checkout(args):
         return 0
 
     # Checkout existing branch (or alias)
+    if not args.branch:
+        print("✘ Error: Branch name or alias is required when not creating a new branch.")
+        return 1
     checkout_branch(args.branch)
     return 0
 

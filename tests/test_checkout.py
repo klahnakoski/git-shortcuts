@@ -98,6 +98,31 @@ class TestCheckout(TestCase):
         self.assertTrue(self.is_staged("test.txt"), "test.txt should still be staged")
         self.assertEqual(test_file.read(), "original content\n", "Content should be unchanged")
 
+    def test_checkout_new_branch_with_alias_and_base(self):
+        # Create a master branch
+        self.sh(["git", "checkout", "-b", "master"])
+        self.sh(["git", "checkout", "main"])  # back to main
+
+        # Use subprocess to call the CLI for creating new branch with alias and from base
+        result = subprocess.run([
+            "gscut", "checkout", "-b", "this-is-a-test", "--as", "test", "--from", "master"
+        ], cwd=self.repo.os_path, capture_output=True, text=True)
+
+        # Should succeed
+        self.assertEqual(result.returncode, 0, f"CLI failed: {result.stderr}")
+
+        # Check that we are on the new branch
+        current_branch = self.sh(["git", "rev-parse", "--abbrev-ref", "HEAD"]).stdout.strip()
+        self.assertEqual(current_branch, "this-is-a-test")
+
+        # Check that the alias was created
+        alias_file = self.repo / ".git" / "gscut-aliases.json"
+        self.assertTrue(alias_file.exists, "Alias file should exist")
+        import json
+        aliases = json.loads(alias_file.read())
+        self.assertIn("test", aliases, "Alias 'test' should be in aliases")
+        self.assertEqual(aliases["test"], "this-is-a-test", "Alias 'test' should map to 'this-is-a-test'")
+
     def sh(self, args, check=True):
         """Run a shell command in cwd and return CompletedProcess."""
         return subprocess.run(args, cwd=self.repo.os_path, check=check, text=True, capture_output=True)
