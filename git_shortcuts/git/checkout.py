@@ -10,7 +10,6 @@ def stash():
     # Check if anything to stash
     status = run(["git", "status", "--porcelain"], capture_output=True)
     if not status:
-        print("Nothing to stash.")
         return None
 
     # Create unique label
