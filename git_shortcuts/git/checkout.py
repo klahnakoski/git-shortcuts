@@ -96,7 +96,11 @@ def get_current_branch():
 
 def checkout_new_branch_with_alias(long_name, alias=None):
     stash()
-    run(["git", "checkout", "-b", long_name])
+    try:
+        run(["git", "checkout", "-b", long_name])
+    except Exception as cause:
+        print(f"✘ Failed to create branch '{long_name}': {cause}")
+        return
     if alias:
         add_alias(long_name, alias)
         print(f"✔ Created '{long_name}' with alias '{alias}'")
