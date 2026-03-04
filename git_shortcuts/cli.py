@@ -28,8 +28,9 @@ def main():
 
     # Checkout command
     checkout_parser = subparsers.add_parser("checkout", help="Switch branches with smart stashing")
+    checkout_parser.usage = "gscut checkout [branch] [-h] [-b NAME] [--as ALIAS] [--from BASE]"
     checkout_parser.add_argument("branch", nargs='?', metavar="NAME",  help="Branch name or alias to checkout")
-    checkout_parser.add_argument("-b", "--new-branch", metavar="NAME", help="Create new branch with NAME")
+    checkout_parser.add_argument("-b", "--new-branch", metavar="NEW_NAME", help="Create new branch with NAME")
     checkout_parser.add_argument("--as", dest="alias", metavar="ALIAS", help="Alias for the new branch")
     checkout_parser.add_argument(
         "--from", dest="base", metavar="BASE", help="Base branch to branch from (name or alias)"
