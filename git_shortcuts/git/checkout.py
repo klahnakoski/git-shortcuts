@@ -1,5 +1,7 @@
 from datetime import datetime
 
+import subprocess
+
 from git_shortcuts.git.aliases import load_aliases, add_alias
 from git_shortcuts.utils import run
 
@@ -97,9 +99,9 @@ def get_current_branch():
 def checkout_new_branch_with_alias(long_name, alias=None):
     stash()
     try:
-        run(["git", "checkout", "-b", long_name])
-    except Exception as cause:
-        print(f"✘ Failed to create branch '{long_name}': {cause}")
+        run(["git", "checkout", "-b", long_name], capture_output=True)
+    except subprocess.CalledProcessError as e:
+        print(f"✘ Failed to create branch '{long_name}': {e.stderr.strip()}")
         return
     if alias:
         add_alias(long_name, alias)
