@@ -20,7 +20,7 @@ def sanitize_branch_token(branch):
 
 
 def conflicted_paths():
-    out = run(["git", "diff", "--name-only", "--diff-filter=U"], capture_output=True)
+    out = run(["git", "diff", "--name-only", "--diff-filter=U"], capture_output=True).stdout.strip()
     return [line.strip() for line in out.splitlines() if line.strip()]
 
 

@@ -10,7 +10,7 @@ STASH_PREFIX = "stash"
 
 def stash():
     # Check if anything to stash
-    status = run(["git", "status", "--porcelain"], capture_output=True)
+    status = run(["git", "status", "--porcelain"], capture_output=True).stdout.strip()
     if not status:
         branch = get_current_branch()
         print(f"No changes to stash on branch '{branch}'")
@@ -23,14 +23,14 @@ def stash():
 
     # Save the current index state (staged files) before stashing
     # This creates a tree object representing the staged state
-    index_tree = run(["git", "write-tree"], capture_output=True)
+    index_tree = run(["git", "write-tree"], capture_output=True).stdout.strip()
 
     # Push stash with message, including untracked files
     # This will stash all changes (staged, unstaged, and untracked)
     run(["git", "stash", "push", "-u", "-m", tag_name])
 
     # Get most recent stash ref
-    stash_ref = run(["git", "stash", "list"], capture_output=True).splitlines()[0].split(":")[0]
+    stash_ref = run(["git", "stash", "list"], capture_output=True).stdout.strip().splitlines()[0].split(":")[0]
 
     # Create tags: one for the stash, one for the index state
     run(["git", "tag", tag_name, stash_ref])
@@ -42,7 +42,7 @@ def stash():
 
 def stash_apply(long_name):
     # Restore stash if it was created
-    stashes = run(["git", "stash", "list"], capture_output=True)
+    stashes = run(["git", "stash", "list"], capture_output=True).stdout.strip()
     if not stashes:
         return
 
@@ -61,7 +61,7 @@ def stash_apply(long_name):
     index_tag = f"{tag_name}-index"
 
     # Check if we have a saved index state
-    index_tree = run(["git", "rev-parse", "--verify", index_tag], capture_output=True, check=False)
+    index_tree = run(["git", "rev-parse", "--verify", index_tag], capture_output=True, check=False).stdout.strip()
 
     if not index_tree:
         return
@@ -70,7 +70,7 @@ def stash_apply(long_name):
 
     # Now restore the staged state from the saved index tree
     # Get all files from the saved index
-    staged_files_output = run(["git", "ls-tree", "-r", "--name-only", index_tree], capture_output=True)
+    staged_files_output = run(["git", "ls-tree", "-r", "--name-only", index_tree], capture_output=True).stdout.strip()
 
     # For each file that was in the index, check if it differs from HEAD
     # If it does, it was staged and should be re-staged
@@ -79,8 +79,8 @@ def stash_apply(long_name):
             continue
         # Check if this file was actually changed in the index compared to HEAD
         # by comparing the index tree with HEAD
-        file_in_index = run(["git", "ls-tree", index_tree, filepath.strip()], capture_output=True, check=False)
-        file_in_head = run(["git", "ls-tree", "HEAD", filepath.strip()], capture_output=True, check=False)
+        file_in_index = run(["git", "ls-tree", index_tree, filepath.strip()], capture_output=True, check=False).stdout.strip()
+        file_in_head = run(["git", "ls-tree", "HEAD", filepath.strip()], capture_output=True, check=False).stdout.strip()
 
         # If they differ, this file had staged changes
         if file_in_index != file_in_head:
@@ -95,7 +95,7 @@ def stash_apply(long_name):
 
 
 def get_current_branch():
-    return run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True)
+    return run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True).stdout.strip()
 
 
 def checkout_new_branch_with_alias(long_name, alias=None):
@@ -103,7 +103,7 @@ def checkout_new_branch_with_alias(long_name, alias=None):
     try:
         run(["git", "checkout", "-b", long_name], capture_output=True)
     except subprocess.CalledProcessError as e:
-        print(f"✘ Failed to create branch '{long_name}': {e.stderr.strip()}")
+        print(f"✘ Failed to create branch '{long_name}': {e.stderr}")
         stash_apply(original_branch)
         return
 
@@ -119,7 +119,7 @@ def checkout_branch(long_name_or_alias):
 
     original_branch = stash()
     result = run(["git", "checkout", long_name], capture_output=True, check=False)
-    if not result:
+    if result.returncode == 0:
         print(f"✔ Switched to branch '{long_name}'")
         stash_apply(long_name)
     else:
