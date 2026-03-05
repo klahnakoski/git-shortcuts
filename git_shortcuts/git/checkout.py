@@ -119,7 +119,7 @@ def checkout_branch(long_name_or_alias):
 
     original_branch = stash()
     result = run(["git", "checkout", long_name], capture_output=True, check=False)
-    if result:
+    if not result:
         print(f"✔ Switched to branch '{long_name}'")
         stash_apply(long_name)
     else:
