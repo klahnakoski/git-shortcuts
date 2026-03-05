@@ -12,7 +12,9 @@ def stash():
     # Check if anything to stash
     status = run(["git", "status", "--porcelain"], capture_output=True)
     if not status:
-        return None
+        branch = get_current_branch()
+        print(f"No changes to stash on branch '{branch}'")
+        return branch
 
     # Create unique label
     branch = get_current_branch()
@@ -35,7 +37,7 @@ def stash():
     run(["git", "tag", f"{tag_name}-index", index_tree])
 
     print(f"✔ Stashed as {stash_ref} and tagged as {tag_name}")
-    return tag_name
+    return branch
 
 
 def stash_apply(long_name):
@@ -97,12 +99,14 @@ def get_current_branch():
 
 
 def checkout_new_branch_with_alias(long_name, alias=None):
-    stash()
+    original_branch = stash()
     try:
         run(["git", "checkout", "-b", long_name], capture_output=True)
     except subprocess.CalledProcessError as e:
         print(f"✘ Failed to create branch '{long_name}': {e.stderr.strip()}")
+        stash_apply(original_branch)
         return
+
     if alias:
         add_alias(long_name, alias)
         print(f"✔ Created '{long_name}' with alias '{alias}'")
@@ -113,13 +117,11 @@ def checkout_new_branch_with_alias(long_name, alias=None):
 def checkout_branch(long_name_or_alias):
     long_name = load_aliases().get(long_name_or_alias, long_name_or_alias)
 
-    stash()
+    original_branch = stash()
     result = run(["git", "checkout", long_name], capture_output=True, check=False)
     if result:
         print(f"✔ Switched to branch '{long_name}'")
         stash_apply(long_name)
     else:
         print(f"✘ Branch '{long_name}' does not exist.")
-        # Re-apply stash to current branch since checkout failed
-        current_branch = get_current_branch()
-        stash_apply(current_branch)
+        stash_apply(original_branch)
