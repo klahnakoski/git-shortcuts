@@ -5,6 +5,7 @@ from unittest import TestCase
 
 from mo_files import TempDirectory
 
+from git_shortcuts.git.aliases import ALIAS_FILE
 from git_shortcuts.git.checkout import checkout_branch, checkout_new_branch_with_alias
 
 
@@ -104,8 +105,10 @@ class TestCheckout(TestCase):
         self.sh(["git", "checkout", "main"])  # back to main
 
         # Use subprocess to call the CLI for creating new branch with alias and from base
+
+
         result = subprocess.run([
-            "gscut", "checkout", "-b", "this-is-a-test", "--as", "test", "--from", "master"
+            "python", "-m", "git_shortcuts.cli", "checkout", "-b", "this-is-a-test", "--as", "test", "--from", "master"
         ], cwd=self.repo.os_path, capture_output=True, text=True)
 
         # Should succeed
@@ -116,10 +119,10 @@ class TestCheckout(TestCase):
         self.assertEqual(current_branch, "this-is-a-test")
 
         # Check that the alias was created
-        alias_file = self.repo / ".git" / "gscut-aliases.json"
+        alias_file = self.repo / ALIAS_FILE
         self.assertTrue(alias_file.exists, "Alias file should exist")
-        import json
-        aliases = json.loads(alias_file.read())
+
+        aliases = alias_file.read_json()
         self.assertIn("test", aliases, "Alias 'test' should be in aliases")
         self.assertEqual(aliases["test"], "this-is-a-test", "Alias 'test' should map to 'this-is-a-test'")
 
