@@ -8,8 +8,8 @@ import subprocess
 import sys
 
 from git_shortcuts.git.merge import merge
-from git_shortcuts.git.checkout import checkout_branch, checkout_new_branch_with_alias, get_current_branch
-from git_shortcuts.git.aliases import add_alias
+from git_shortcuts.git.checkout import checkout_branch, checkout_new_branch
+from git_shortcuts.git.aliases import add_alias, load_aliases
 
 
 def main():
@@ -67,24 +67,16 @@ def handle_merge(args):
 def handle_checkout(args):
     """Checkout branch with stash/unstash and alias support."""
     # Create new branch
-    current_branch = get_current_branch()
     if args.new_branch:
-        long_name = args.new_branch
-
-        # If base branch specified, checkout base first
-        if args.base:
-            checkout_branch(args.base)
-
-        # Create branch with or without alias
-        checkout_new_branch_with_alias(long_name, args.alias)
-
+        # Create branch with or without alias and base
+        checkout_new_branch(args.new_branch, args.alias, args.base)
         return 0
 
     # Checkout existing branch (or alias)
     if not args.branch:
         print("✘ Error: Branch name or alias is required when not creating a new branch.")
         return 1
-    checkout_branch(args.branch)
+    checkout_branch(args.branch, args.alias)
     return 0
 
 

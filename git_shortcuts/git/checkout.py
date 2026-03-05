@@ -98,8 +98,16 @@ def get_current_branch():
     return run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True).stdout.strip()
 
 
-def checkout_new_branch_with_alias(long_name, alias=None):
+def checkout_new_branch(long_name, alias=None, base=None):
     original_branch = stash()
+    if base:
+        # Checkout base first
+        result = run(["git", "checkout", base], capture_output=True, check=False)
+        if result.returncode != 0:
+            print(f"✘ Failed to checkout base branch '{base}'")
+            stash_apply(original_branch)
+            return
+
     try:
         run(["git", "checkout", "-b", long_name], capture_output=True)
     except subprocess.CalledProcessError as e:
@@ -114,13 +122,17 @@ def checkout_new_branch_with_alias(long_name, alias=None):
         print(f"✔ Created '{long_name}'")
 
 
-def checkout_branch(long_name_or_alias):
+def checkout_branch(long_name_or_alias, alias=None):
     long_name = load_aliases().get(long_name_or_alias, long_name_or_alias)
 
     original_branch = stash()
     result = run(["git", "checkout", long_name], capture_output=True, check=False)
     if result.returncode == 0:
-        print(f"✔ Switched to branch '{long_name}'")
+        if alias:
+            add_alias(long_name, alias)
+            print(f"✔ Switched to branch '{long_name}' with alias '{alias}'")
+        else:
+            print(f"✔ Switched to branch '{long_name}'")
         stash_apply(long_name)
     else:
         print(f"✘ Branch '{long_name}' does not exist.")

@@ -6,7 +6,7 @@ from unittest import TestCase
 from mo_files import TempDirectory
 
 from git_shortcuts.git.aliases import ALIAS_FILE
-from git_shortcuts.git.checkout import checkout_branch, checkout_new_branch_with_alias
+from git_shortcuts.git.checkout import checkout_branch, checkout_new_branch
 
 
 class TestCheckout(TestCase):
@@ -34,7 +34,7 @@ class TestCheckout(TestCase):
 
     def test_checkout_preserves_staged_and_unstaged_files(self):
         # Create feature branch with alias
-        checkout_new_branch_with_alias("feature-branch", "fb")
+        checkout_new_branch("feature-branch", "fb")
 
         # Add two files: one staged, one unstaged
         staged_file = self.repo / "staged.txt"
@@ -125,6 +125,37 @@ class TestCheckout(TestCase):
         aliases = alias_file.read_json()
         self.assertIn("test", aliases, "Alias 'test' should be in aliases")
         self.assertEqual(aliases["test"], "this-is-a-test", "Alias 'test' should map to 'this-is-a-test'")
+
+    def test_checkout_existing_branch_with_alias(self):
+        # Create a master branch
+        self.sh(["git", "checkout", "-b", "master"])
+        self.sh(["git", "checkout", "-b", "this-is-a-test"])
+        self.sh(["git", "checkout", "main"])  # back to main
+
+        # Use subprocess to call the CLI for creating new branch with alias and from base
+
+
+        result = subprocess.run([
+            "python", "-m", "git_shortcuts.cli", "checkout", "this-is-a-test", "--as", "test"
+        ], cwd=self.repo.os_path, capture_output=True, text=True)
+
+        # Should succeed
+        self.assertEqual(result.returncode, 0, f"CLI failed: {result.stderr}")
+
+        # Check that we are on the new branch
+        current_branch = self.sh(["git", "rev-parse", "--abbrev-ref", "HEAD"]).stdout.strip()
+        self.assertEqual(current_branch, "this-is-a-test")
+
+        # Check that the alias was created
+        alias_file = self.repo / ALIAS_FILE
+        self.assertTrue(alias_file.exists, "Alias file should exist")
+
+        aliases = alias_file.read_json()
+        self.assertIn("test", aliases, "Alias 'test' should be in aliases")
+        self.assertEqual(aliases["test"], "this-is-a-test", "Alias 'test' should map to 'this-is-a-test'")
+
+
+
 
     def sh(self, args, check=True):
         """Run a shell command in cwd and return CompletedProcess."""
