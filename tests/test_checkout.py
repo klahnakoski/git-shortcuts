@@ -119,6 +119,7 @@ class TestCheckout(TestCase):
                 "master",
             ],
             cwd=self.repo.os_path,
+            env={"PYTHONPATH": ".", **os.environ},
             capture_output=True,
             text=True,
         )
