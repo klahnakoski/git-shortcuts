@@ -3,14 +3,13 @@ from datetime import datetime
 import subprocess
 
 from git_shortcuts.git.aliases import load_aliases, add_alias
-from git_shortcuts.utils import run
 
 STASH_PREFIX = "stash"
 
 
 def stash():
     # Check if anything to stash
-    status = run(["git", "status", "--porcelain"], capture_output=True).stdout.strip()
+    status = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True).stdout.strip()
     if not status:
         branch = get_current_branch()
         print(f"No changes to stash on branch '{branch}'")
@@ -23,18 +22,18 @@ def stash():
 
     # Save the current index state (staged files) before stashing
     # This creates a tree object representing the staged state
-    index_tree = run(["git", "write-tree"], capture_output=True).stdout.strip()
+    index_tree = subprocess.run(["git", "write-tree"], capture_output=True, text=True).stdout.strip()
 
     # Push stash with message, including untracked files
     # This will stash all changes (staged, unstaged, and untracked)
-    run(["git", "stash", "push", "-u", "-m", tag_name])
+    subprocess.run(["git", "stash", "push", "-u", "-m", tag_name])
 
     # Get most recent stash ref
-    stash_ref = run(["git", "stash", "list"], capture_output=True).stdout.strip().splitlines()[0].split(":")[0]
+    stash_ref = subprocess.run(["git", "stash", "list"], capture_output=True, text=True).stdout.strip().splitlines()[0].split(":")[0]
 
     # Create tags: one for the stash, one for the index state
-    run(["git", "tag", tag_name, stash_ref])
-    run(["git", "tag", f"{tag_name}-index", index_tree])
+    subprocess.run(["git", "tag", tag_name, stash_ref])
+    subprocess.run(["git", "tag", f"{tag_name}-index", index_tree])
 
     print(f"✔ Stashed as {stash_ref} and tagged as {tag_name}")
     return branch
@@ -42,7 +41,7 @@ def stash():
 
 def stash_apply(long_name):
     # Restore stash if it was created
-    stashes = run(["git", "stash", "list"], capture_output=True).stdout.strip()
+    stashes = subprocess.run(["git", "stash", "list"], capture_output=True, text=True).stdout.strip()
     if not stashes:
         return
 
@@ -61,16 +60,16 @@ def stash_apply(long_name):
     index_tag = f"{tag_name}-index"
 
     # Check if we have a saved index state
-    index_tree = run(["git", "rev-parse", "--verify", index_tag], capture_output=True, check=False).stdout.strip()
+    index_tree = subprocess.run(["git", "rev-parse", "--verify", index_tag], capture_output=True, check=False, text=True).stdout.strip()
 
     if not index_tree:
         return
     # First, apply the stash (this brings back all changes as unstaged)
-    run(["git", "stash", "apply", stash_ref])
+    subprocess.run(["git", "stash", "apply", stash_ref])
 
     # Now restore the staged state from the saved index tree
     # Get all files from the saved index
-    staged_files_output = run(["git", "ls-tree", "-r", "--name-only", index_tree], capture_output=True).stdout.strip()
+    staged_files_output = subprocess.run(["git", "ls-tree", "-r", "--name-only", index_tree], capture_output=True, text=True).stdout.strip()
 
     # For each file that was in the index, check if it differs from HEAD
     # If it does, it was staged and should be re-staged
@@ -80,40 +79,40 @@ def stash_apply(long_name):
         # Check if this file was actually changed in the index compared to HEAD
         # by comparing the index tree with HEAD
         file_in_index = (
-            run(["git", "ls-tree", index_tree, filepath.strip()], capture_output=True, check=False).stdout.strip()
+            subprocess.run(["git", "ls-tree", index_tree, filepath.strip()], capture_output=True, check=False, text=True).stdout.strip()
         )
         file_in_head = (
-            run(["git", "ls-tree", "HEAD", filepath.strip()], capture_output=True, check=False).stdout.strip()
+            subprocess.run(["git", "ls-tree", "HEAD", filepath.strip()], capture_output=True, check=False, text=True).stdout.strip()
         )
 
         # If they differ, this file had staged changes
         if file_in_index != file_in_head:
-            run(["git", "add", filepath.strip()], check=False)
+            subprocess.run(["git", "add", filepath.strip()], check=False)
 
     # Drop the stash and clean up tags
-    run(["git", "stash", "drop", stash_ref])
-    run(["git", "tag", "-d", tag_name], check=False)
-    run(["git", "tag", "-d", index_tag], check=False)
+    subprocess.run(["git", "stash", "drop", stash_ref])
+    subprocess.run(["git", "tag", "-d", tag_name], check=False)
+    subprocess.run(["git", "tag", "-d", index_tag], check=False)
 
     print(f"✔ Applied stash {stash_ref} and restored staged/unstaged state")
 
 
 def get_current_branch():
-    return run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True).stdout.strip()
+    return subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True).stdout.strip()
 
 
 def checkout_new_branch(long_name, alias=None, base=None):
     original_branch = stash()
     if base:
         # Checkout base first
-        result = run(["git", "checkout", base], capture_output=True, check=False)
+        result = subprocess.run(["git", "checkout", base], capture_output=True, check=False, text=True)
         if result.returncode != 0:
             print(f"✘ Failed to checkout base branch '{base}'")
             stash_apply(original_branch)
             return
 
     try:
-        run(["git", "checkout", "-b", long_name], capture_output=True)
+        subprocess.run(["git", "checkout", "-b", long_name], capture_output=True, text=True)
     except subprocess.CalledProcessError as e:
         print(f"✘ Failed to create branch '{long_name}': {e.stderr}")
         stash_apply(original_branch)
@@ -130,7 +129,7 @@ def checkout_branch(long_name_or_alias, alias=None):
     long_name = load_aliases().get(long_name_or_alias, long_name_or_alias)
 
     original_branch = stash()
-    result = run(["git", "checkout", long_name], capture_output=True, check=False)
+    result = subprocess.run(["git", "checkout", long_name], capture_output=True, check=False, text=True)
     if result.returncode == 0:
         if alias:
             add_alias(long_name, alias)

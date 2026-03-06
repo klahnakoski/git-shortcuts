@@ -5,7 +5,6 @@ import sys
 
 from mo_files import File
 
-from git_shortcuts.utils import run
 
 # Regex pattern for git conflict markers:
 # <<<<<<<\n...ours...\n=======\n...theirs...\n>>>>>>>
@@ -20,7 +19,7 @@ def sanitize_branch_token(branch):
 
 
 def conflicted_paths():
-    out = run(["git", "diff", "--name-only", "--diff-filter=U"], capture_output=True).stdout.strip()
+    out = subprocess.run(["git", "diff", "--name-only", "--diff-filter=U"], capture_output=True, text=True).stdout.strip()
     return [line.strip() for line in out.splitlines() if line.strip()]
 
 

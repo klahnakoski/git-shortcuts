@@ -1,12 +1,5 @@
-import subprocess
-
 import requests
 from mo_json import json2value, scrub
-
-
-def run(cmd, check=True, capture_output=False, text=True):
-    result = subprocess.run(cmd, check=check, capture_output=capture_output, text=text)
-    return result
 
 
 def http_get(url, *, method="GET", session=None, json=None, **kwargs):
