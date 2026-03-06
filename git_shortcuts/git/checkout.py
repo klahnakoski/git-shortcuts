@@ -79,8 +79,12 @@ def stash_apply(long_name):
             continue
         # Check if this file was actually changed in the index compared to HEAD
         # by comparing the index tree with HEAD
-        file_in_index = run(["git", "ls-tree", index_tree, filepath.strip()], capture_output=True, check=False).stdout.strip()
-        file_in_head = run(["git", "ls-tree", "HEAD", filepath.strip()], capture_output=True, check=False).stdout.strip()
+        file_in_index = (
+            run(["git", "ls-tree", index_tree, filepath.strip()], capture_output=True, check=False).stdout.strip()
+        )
+        file_in_head = (
+            run(["git", "ls-tree", "HEAD", filepath.strip()], capture_output=True, check=False).stdout.strip()
+        )
 
         # If they differ, this file had staged changes
         if file_in_index != file_in_head:

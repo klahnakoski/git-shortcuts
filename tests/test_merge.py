@@ -13,7 +13,6 @@ HIT = HERE / "hit_merge.py"  # <-- adjust if your script filename/path differs
 
 
 class TestMerge(TestCase):
-
     def setUp(self):
         # Fresh temp repo per test
         self.current_dir = Path.cwd()
@@ -189,7 +188,8 @@ class TestMerge(TestCase):
         5. No conflict markers in main file
         """
         # Create initial file with sections
-        content_init = textwrap.dedent("""\
+        content_init = textwrap.dedent(
+            """\
             # Header
             
             intro_line_1
@@ -238,7 +238,8 @@ class TestMerge(TestCase):
             outro_8
             
             # Footer
-        """)
+        """
+        )
 
         # Feature branch: modify sections 1 and 3
         self.sh(["git", "checkout", "main"])
@@ -246,7 +247,8 @@ class TestMerge(TestCase):
         self.sh(["git", "add", "-A"])
         self.sh(["git", "commit", "-m", "init multi.txt"])
 
-        content_feature = textwrap.dedent("""\
+        content_feature = textwrap.dedent(
+            """\
             # Header
             
             intro_line_1
@@ -295,7 +297,8 @@ class TestMerge(TestCase):
             outro_8
             
             # Footer
-        """)
+        """
+        )
         self.sh(["git", "checkout", "-b", "feature"])
         (self.repo / "multi.txt").write(content_feature)
         self.sh(["git", "add", "-A"])
@@ -303,7 +306,8 @@ class TestMerge(TestCase):
 
         # Main branch: modify sections 2 and 3 (section 3 conflicts with feature)
         self.sh(["git", "checkout", "main"])
-        content_main = textwrap.dedent("""\
+        content_main = textwrap.dedent(
+            """\
             # Header
             
             intro_line_1
@@ -352,7 +356,8 @@ class TestMerge(TestCase):
             outro_8
             
             # Footer
-        """)
+        """
+        )
         (self.repo / "multi.txt").write(content_main)
         self.sh(["git", "add", "-A"])
         self.sh(["git", "commit", "-m", "main: modify sections 2 and 3"])
@@ -367,10 +372,8 @@ class TestMerge(TestCase):
         feature_copy = self.repo / "multi.feature.txt"
         self.assertTrue(feature_copy.exists, "Feature copy should exist for conflict reference")
         feature_content = feature_copy.read()
-        self.assertIn("section_1_line_1_FEATURE", feature_content,
-                      "Feature copy should have feature's section 1")
-        self.assertIn("section_3_line_1_FEATURE", feature_content,
-                      "Feature copy should have feature's section 3")
+        self.assertIn("section_1_line_1_FEATURE", feature_content, "Feature copy should have feature's section 1")
+        self.assertIn("section_3_line_1_FEATURE", feature_content, "Feature copy should have feature's section 3")
 
         # Verify main file has correct merge result:
         # - Section 1: FEATURE version (clean merge - only feature changed it)
@@ -378,12 +381,11 @@ class TestMerge(TestCase):
         # - Section 3: MAIN version (conflict - we keep ours)
         main_content = (self.repo / "multi.txt").read()
 
-        self.assertIn("section_1_line_1_FEATURE", main_content,
-                      "Section 1: should have feature changes (clean merge)")
-        self.assertIn("section_2_line_1_MAIN", main_content,
-                      "Section 2: should have main changes (clean merge)")
-        self.assertIn("section_3_line_1_MAIN", main_content,
-                      "Section 3: should have main version (conflict resolved with ours)")
+        self.assertIn("section_1_line_1_FEATURE", main_content, "Section 1: should have feature changes (clean merge)")
+        self.assertIn("section_2_line_1_MAIN", main_content, "Section 2: should have main changes (clean merge)")
+        self.assertIn(
+            "section_3_line_1_MAIN", main_content, "Section 3: should have main version (conflict resolved with ours)"
+        )
 
         # Should NOT have conflicting markers in main file
         self.assertNotIn("<<<<<<<", main_content, "No conflict markers should remain")
@@ -393,9 +395,6 @@ class TestMerge(TestCase):
         # Verify merge commit message
         self.assertEqual(self.git_log_body(), "merge feature")
 
-
-
-
     # ---------------------------
     # Helper functions
     # ---------------------------
@@ -404,11 +403,9 @@ class TestMerge(TestCase):
         """Run a shell command in cwd and return CompletedProcess."""
         return subprocess.run(args, cwd=self.repo.os_path, check=check, text=True, capture_output=True)
 
-
     def git_log_body(self) -> str:
         out = self.sh(["git", "log", "-1", "--pretty=%B"]).stdout.strip()
         return out
-
 
     def commit_parent_count(self) -> int:
         # "SHA PARENT1 PARENT2" -> parents count

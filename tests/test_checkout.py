@@ -10,7 +10,6 @@ from git_shortcuts.git.checkout import checkout_branch, checkout_new_branch
 
 
 class TestCheckout(TestCase):
-
     def setUp(self):
         # Fresh temp repo per test
         self.current_dir = Path.cwd()
@@ -106,10 +105,23 @@ class TestCheckout(TestCase):
 
         # Use subprocess to call the CLI for creating new branch with alias and from base
 
-
-        result = subprocess.run([
-            "python", "-m", "git_shortcuts.cli", "checkout", "-b", "this-is-a-test", "--as", "test", "--from", "master"
-        ], cwd=self.repo.os_path, capture_output=True, text=True)
+        result = subprocess.run(
+            [
+                "python",
+                "-m",
+                "git_shortcuts.cli",
+                "checkout",
+                "-b",
+                "this-is-a-test",
+                "--as",
+                "test",
+                "--from",
+                "master",
+            ],
+            cwd=self.repo.os_path,
+            capture_output=True,
+            text=True,
+        )
 
         # Should succeed
         self.assertEqual(result.returncode, 0, f"CLI failed: {result.stderr}")
@@ -133,11 +145,12 @@ class TestCheckout(TestCase):
         self.sh(["git", "checkout", "main"])  # back to main
 
         # Use subprocess to call the CLI for creating new branch with alias and from base
-
-
-        result = subprocess.run([
-            "python", "-m", "git_shortcuts.cli", "checkout", "this-is-a-test", "--as", "test"
-        ], cwd=self.repo.os_path, capture_output=True, text=True)
+        result = subprocess.run(
+            ["python", "-m", "git_shortcuts.cli", "checkout", "this-is-a-test", "--as", "test"],
+            cwd=self.repo.os_path,
+            capture_output=True,
+            text=True,
+        )
 
         # Should succeed
         self.assertEqual(result.returncode, 0, f"CLI failed: {result.stderr}")
@@ -154,9 +167,6 @@ class TestCheckout(TestCase):
         self.assertIn("test", aliases, "Alias 'test' should be in aliases")
         self.assertEqual(aliases["test"], "this-is-a-test", "Alias 'test' should map to 'this-is-a-test'")
 
-
-
-
     def sh(self, args, check=True):
         """Run a shell command in cwd and return CompletedProcess."""
         return subprocess.run(args, cwd=self.repo.os_path, check=check, text=True, capture_output=True)
@@ -166,4 +176,3 @@ class TestCheckout(TestCase):
         result = self.sh(["git", "diff", "--cached", "--name-only"])
         staged_files = result.stdout.strip().splitlines()
         return filepath in staged_files
-

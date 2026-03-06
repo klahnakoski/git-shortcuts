@@ -12,12 +12,13 @@ from git_shortcuts import github
 
 BRANCH_PREFIX = "test_"
 
+
 @add_error_reporting
 @skip("skipping github session test to avoid hitting rate limits during development")
 class TestGithubSession(TestCase):
     config = None
 
-    def __init__(self, methodName='runTest'):
+    def __init__(self, methodName="runTest"):
         super().__init__(methodName)
 
     def setUp(self):
