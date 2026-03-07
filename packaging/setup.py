@@ -16,5 +16,5 @@ setup(
     name='git-shortcuts',
     packages=["git_shortcuts","git_shortcuts.git","git_shortcuts.github"],
     url='https://github.com/klahnakoski/git-shortcuts',
-    version='1.708.26065'
+    version='1.708.26066'
 )
